@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#CC000000"
+    tools:context=".PlayingNowActivity"
+    >
+
+        <TextView
+            android:id="@+id/playigNowText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="40dp"
+            android:fontFamily="@font/caveat_brush"
+            android:gravity="center"
+            android:text="Playing Now"
+            android:textColor="@color/white"
+            android:textSize="45sp"
+            android:textStyle="bold" />
+
+
+        <RelativeLayout
+            android:layout_below="@id/playigNowText"
+            android:id="@+id/songImageLayout"
+            android:layout_width="325dp"
+            android:layout_height="325dp"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="35dp"
+            android:padding="10dp"
+            android:background="@drawable/playing_now_disc_bg"
+            >
+
+            <FrameLayout
+                android:id="@+id/discSongFrame"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:id="@+id/discPlayingNow"
+                    android:layout_width="300dp"
+                    android:layout_height="300dp"
+                    android:src="@drawable/disc"
+                    android:layout_gravity="center"/>
+
+                <!-- Inner song circle image -->
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/songInnerImage"
+                    android:layout_width="150dp"
+                    android:layout_height="150dp"
+                    android:layout_gravity="center"
+                    android:padding="5dp"
+                    app:strokeColor="@color/black"
+                    app:strokeWidth="3dp"
+                    android:src="@drawable/anne_marrie_song"
+                    app:shapeAppearanceOverlay="@style/Circular"
+                    />
+
+            </FrameLayout>
+
+        </RelativeLayout>
+
+        <TextView
+            android:layout_below="@id/songImageLayout"
+            android:id="@+id/playingNowSongNameTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"
+            android:text="Never Go Back"
+            android:textColor="@color/white"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_below="@+id/playingNowSongNameTv"
+            android:id="@+id/playingNowSingerTv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:gravity="center"
+            android:layout_centerHorizontal="true"
+            android:text="Dennis Lloyd"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            />
+
+        <LinearLayout
+            android:layout_above="@id/songTimeLayout"
+            android:id="@+id/playingButtonsLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+
+            android:layout_centerHorizontal="true"
+            >
+
+            <ImageButton
+                android:id="@+id/prevBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/previous_45px"
+                android:background="#0000"
+                android:layout_gravity="center"
+                android:layout_marginRight="5dp"
+                ></ImageButton>
+
+            <ImageButton
+                android:id="@+id/playPauseBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/pause_86px"
+                android:background="#0000"
+                android:layout_gravity="center"
+                ></ImageButton>
+
+            <ImageButton
+                android:id="@+id/nextBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/next_45px"
+                android:background="#0000"
+                android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                ></ImageButton>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_above="@+id/bottom_menu_bar"
+            android:id="@+id/songTimeLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="15dp"
+            android:layout_marginBottom="100dp"
+            >
+
+            <SeekBar
+                android:id="@+id/songProgressSeekBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:max="90"
+                android:min="1"
+                android:progress="0"
+                android:thumb="@drawable/if_blue_ball"
+                android:progressDrawable="@drawable/progress_drawable"
+                android:splitTrack="false"
+                android:layout_marginLeft="10dp"
+                android:secondaryProgress="0"
+                />
+
+            <TextView
+                android:id="@+id/progressStartTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/songProgressSeekBar"
+                android:layout_marginLeft="8dp"
+                android:text="00:00"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                >
+            </TextView>
+
+            <TextView
+                android:id="@+id/progressEndTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignRight="@id/songProgressSeekBar"
+                android:layout_below="@+id/songProgressSeekBar"
+                android:layout_marginRight="8dp"
+                android:text="03:15"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                >
+            </TextView>
+
+
+        </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/bottom_menu_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="8dp"
+        android:orientation="horizontal"
+        android:background="@color/white">
+
+        <!-- Icon 1 (Home) -->
+        <ImageView
+            android:id="@+id/home_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:clickable="true"
+            android:src="@drawable/home" />
+
+        <!-- Empty View to Fill Space (for Settings Icon) -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Icon 2 (Music Library) -->
+        <ImageView
+            android:id="@+id/play_now_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:src="@drawable/note" />
+
+        <!-- Empty View to Fill Space (for Settings Icon) -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Icon 3 (Settings) -->
+        <ImageView
+            android:id="@+id/settings_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="5dp"
+            android:clickable="true"
+            android:src="@drawable/settings" />
+    </LinearLayout>
+
+
+</RelativeLayout>

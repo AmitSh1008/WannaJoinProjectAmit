@@ -1,0 +1,167 @@
+package com.example.wannajoin;
+
+import java.io.Serializable;
+
+public class DBCollection {
+    static class Song implements Serializable
+    {
+        private String name;
+        private String singer;
+        private int year;
+        private String duration;
+        private String genre;
+        private String image;
+        private String link;
+
+        public Song()
+        {
+
+        }
+
+        public Song(String name, String singer, int year, String duration, String genre, String image, String link) {
+            this.name = name;
+            this.singer = singer;
+            this.year = year;
+            this.duration = duration;
+            this.genre = genre;
+            this.image = image;
+            this.link = link;
+        }
+
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getSinger() {
+            return singer;
+        }
+
+        public void setSinger(String singer) {
+            this.singer = singer;
+        }
+
+        public int getYear() {
+            return year;
+        }
+
+        public void setYear(int year) {
+            this.year = year;
+        }
+
+        public String getDuration() {
+            return duration;
+        }
+
+        public void setDuration(String duration) {
+            this.duration = duration;
+        }
+
+        public String getGenre() {
+            return genre;
+        }
+
+        public void setGenre(String genre) {
+            this.genre = genre;
+        }
+
+        public String getImage() {
+            return image;
+        }
+
+        public void setImage(String image) {
+            this.image = image;
+        }
+
+        public String getLink() {
+            return link;
+        }
+
+        public void setLink(String link) {
+            this.link = link;
+        }
+    }
+
+    static class Singer{
+        private String name;
+        private String songs;
+        private String image;
+
+        public Singer() {
+        }
+
+        public Singer(String name, String songs, String image) {
+            this.name = name;
+            this.songs = songs;
+            this.image = image;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getSongs() {
+            return songs;
+        }
+
+        public void setSongs(String songs) {
+            this.songs = songs;
+        }
+
+        public String getImage() {
+            return image;
+        }
+
+        public void setImage(String image) {
+            this.image = image;
+        }
+    }
+
+    static class Genre{
+        private String name;
+        private String songs;
+        private String image;
+
+        public Genre() {
+        }
+
+        public Genre(String name, String songs, String image) {
+            this.name = name;
+            this.songs = songs;
+            this.image = image;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getSongs() {
+            return songs;
+        }
+
+        public void setSongs(String songs) {
+            this.songs = songs;
+        }
+
+        public String getImage() {
+            return image;
+        }
+
+        public void setImage(String image) {
+            this.image = image;
+        }
+    }
+
+}

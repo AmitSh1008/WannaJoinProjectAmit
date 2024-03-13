@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/playing_now_disc_bg"/>
+
+    <LinearLayout
+        android:id="@+id/loginLayout"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:background="@drawable/rounded_square_bg"
+        android:orientation="vertical"
+        android:layout_marginHorizontal="40dp"
+        android:layout_marginVertical="150dp"
+        android:paddingHorizontal="20dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/berkshire_swash"
+            android:text="WannaJoin?"
+            android:textSize="35dp">
+
+        </TextView>
+
+        <LinearLayout
+            android:id="@+id/emailLayout"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/thicker_rounded_square_bg"
+            android:gravity="center_vertical"
+            android:layout_marginTop="30dp"
+            android:paddingHorizontal="10dp"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/email">
+            </ImageView>
+
+            <!-- Email EditText -->
+            <EditText
+                android:id="@+id/emailEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:hint="Email"
+                android:lines="1"
+                android:text="amitcheck1008@gmail.com"
+                android:textColor="@color/black"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/passwordLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/thicker_rounded_square_bg"
+            android:gravity="center_vertical"
+            android:layout_marginTop="10dp"
+            android:paddingHorizontal="10dp"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@drawable/lock">
+
+            </ImageView>
+
+            <!-- Password EditText -->
+            <EditText
+                android:id="@+id/passwordEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="5dp"
+                android:hint="Password"
+                android:textColor="@color/black"
+                android:inputType="textPassword"
+                android:lines="1"
+                android:maxLength="12"
+                android:text="Amit100806"/>
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/errorReaction"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="15dp"
+            android:textColor="#ef233c"
+            android:layout_marginVertical="5dp"
+            android:visibility="invisible"
+            >
+
+        </TextView>
+
+
+        <!-- Remember Me Checkbox -->
+        <CheckBox
+            android:id="@+id/rememberMeCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_marginTop="-5dp"
+            android:text="Remember Me" />
+
+        <!-- Login Button -->
+        <Button
+            android:id="@+id/loginButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Login" />
+
+        <!-- Forgot Password TextView -->
+        <TextView
+            android:id="@+id/forgotPasswordTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="16dp"
+            android:text="Forgot Password?"
+            android:textColor="#0078D4"
+            android:clickable="true"/>
+
+        <!-- Don't Have an Account TextView -->
+        <TextView
+            android:id="@+id/dontHaveAccountTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Don't have an account? Sign up"
+            android:textColor="#0078D4"
+            android:layout_marginTop="5dp"
+            android:clickable="true"
+            android:onClick="moveToSignUp"/>
+
+    </LinearLayout>
+</FrameLayout>

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "901168733476",
+    "project_id": "wannajoin-ecec8",
+    "storage_bucket": "wannajoin-ecec8.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:901168733476:android:cbd601dd155e0f405367b1",
+        "android_client_info": {
+          "package_name": "com.example.wannajoin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCF9rXP8ggMrCJDww9zqVCRpzttnep0EI4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
