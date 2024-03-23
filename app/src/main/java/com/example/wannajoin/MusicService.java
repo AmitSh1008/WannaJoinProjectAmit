@@ -94,7 +94,7 @@ public class MusicService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         createNotificationChannel();
 
-        if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION.SERVICE_BUILD_ACTION)) {
+        if (intent != null && intent.getAction() != null && intent.getAction().equals(Constants.ACTION.SERVICE_BUILD_ACTION)) {
             activityMessenger = intent.getParcelableExtra("Messenger");
             stopReceive = new Intent(getApplicationContext(), MusicService.class);
             stopReceive.setAction(Constants.ACTION.SERVICE_STOP_ACTION);
@@ -108,7 +108,7 @@ public class MusicService extends Service {
             }
         }
 
-        if (intent.getAction() != null && intent.getAction().equals(Constants.ACTION.SERVICE_STOP_ACTION)) {
+        if (intent != null && intent.getAction() != null && intent.getAction().equals(Constants.ACTION.SERVICE_STOP_ACTION)) {
             try {
                 mediaPlayer.stop();
                 cancelNotification(CHANNEL_ID_NUM);

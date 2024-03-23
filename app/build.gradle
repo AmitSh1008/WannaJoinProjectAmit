@@ -50,9 +50,8 @@ dependencies {
     //events
     implementation 'org.greenrobot:eventbus:3.2.0'
 
-    //Animations
-        //Intents
-    implementation 'com.github.AtifSayings:Animatoo:1.0.1'
+    //DrawerLayout
+    implementation 'androidx.drawerlayout:drawerlayout:1.1.1'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

@@ -37,10 +37,7 @@ public class SignUpActivity extends AppCompatActivity {
     private FirebaseAuth auth;
     private EditText etUsername, etEmail, etPassword, etConPassword, etPhoneNum, etStatus;
     private Button btnSignup;
-    private TextView tvLoginRedirect, tvGenderError;
-
-    /*private RadioGroup radioGroupGender;
-    private RadioButton radioButtonMale, radioButtonFemale;*/
+    private TextView tvLoginRedirect;
 
     private ImageView profileImageView;
     private Uri imageUri;
@@ -60,29 +57,9 @@ public class SignUpActivity extends AppCompatActivity {
         etStatus = findViewById(R.id.statusSuEditText);
         btnSignup = findViewById(R.id.registerButton);
         tvLoginRedirect = findViewById(R.id.alreadyUserTextView);
-        //tvGenderError = findViewById(R.id.tvGenderError);
 
         profileImageView = findViewById(R.id.profileImageView);
         storageRef = FirebaseStorage.getInstance().getReference();
-
-        // Initialize RadioGroup and RadioButtons for Gender
-        /*radioGroupGender = findViewById(R.id.radioGroupGender);
-        radioButtonMale = findViewById(R.id.radioButtonMale);
-        radioButtonFemale = findViewById(R.id.radioButtonFemale);
-
-        // Set a listener for the RadioGroup to detect changes in selection
-        radioGroupGender.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
-                // Check which RadioButton is selected
-                if (checkedId == R.id.radioButtonMale) {
-                    profileImageView.setImageResource(R.drawable.male_default_picture);
-                } else if (checkedId == R.id.radioButtonFemale) {
-                    profileImageView.setImageResource(R.drawable.female_default_picture);
-                }
-            }
-        });*/
-
 
         btnSignup.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -121,11 +98,6 @@ public class SignUpActivity extends AppCompatActivity {
                     etPhoneNum.setError("phone number cannot be empty!");
                     allValid = false;
                 }
-                /*if (!radioButtonMale.isChecked() && !radioButtonFemale.isChecked())
-                {
-                    tvGenderError.setVisibility(View.VISIBLE);
-                    allValid = false;
-                }*/
                 if (allValid)
                 {
                     if (password.equals(conPassword)) {
@@ -244,7 +216,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void saveUserData(String Uid , String username, String email, String phoneNum, String status, String profileImageUrl) {
-        User user = new User(username, email, phoneNum, status, profileImageUrl);
+        DBCollection.User user = new DBCollection.User(Uid, username, email, phoneNum, status, profileImageUrl);
         refUsers.child(Uid).setValue(user);
     }
 

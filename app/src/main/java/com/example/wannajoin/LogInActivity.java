@@ -1,6 +1,9 @@
 package com.example.wannajoin;
 
+import static com.example.wannajoin.FBRef.refUsers;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -20,6 +23,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 
 public class LogInActivity extends AppCompatActivity {
 
@@ -33,18 +39,6 @@ public class LogInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
-
-
-        SharedPreferences sharedPreferencess = getSharedPreferences("RememberMe",MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferencess.edit();
-        editor.remove("StayConnect");
-        editor.remove("Email");
-        editor.remove("Password");
-        editor.apply();
-
-
-
-
         auth = FirebaseAuth.getInstance();
 
         SharedPreferences sharedPreferences = getSharedPreferences("RememberMe",MODE_PRIVATE);
@@ -65,7 +59,7 @@ public class LogInActivity extends AppCompatActivity {
                                     Toast.makeText(getApplicationContext(), "Authentication succeeded.",
                                             Toast.LENGTH_SHORT).show();
 
-                                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                    findUserById(userConnected.getUid());
                                 }
                                 else {
                                     auth.signOut();
@@ -118,7 +112,7 @@ public class LogInActivity extends AppCompatActivity {
                                                     editor.putString("Password", password);
                                                     editor.commit();
                                                 }
-                                                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                                findUserById(userConnected.getUid());
                                             }
                                             else {
                                                 auth.signOut();
@@ -156,6 +150,55 @@ public class LogInActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void findUserById(String uId)
+    {
+        refUsers.orderByChild("userId").equalTo(uId).addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot userSnapshot, String prevChildKey) {
+                // Get song data
+                String userId = userSnapshot.child("userId").getValue(String.class);
+                String userName = userSnapshot.child("name").getValue(String.class);
+                String email = userSnapshot.child("email").getValue(String.class);
+                String image = userSnapshot.child("image").getValue(String.class);
+                String phoneNum = userSnapshot.child("phoneNum").getValue(String.class);
+                String status = userSnapshot.child("status").getValue(String.class);
+
+                Bundle foundUser = new Bundle();
+                foundUser.putString("UID", userId);
+                foundUser.putString("NAME", userName);
+                foundUser.putString("IMAGE", image);
+                foundUser.putString("EMAIL", email);
+                foundUser.putString("PHONENUM", phoneNum);
+                foundUser.putString("STATUS", status);
+                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                intent.putExtra("userConnected", foundUser);
+                startActivity(intent);
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+
+            // ...
+        });
     }
 
 }

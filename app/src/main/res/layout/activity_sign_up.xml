@@ -71,7 +71,7 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginLeft="5dp"
                 android:hint="Email"
-                android:text="amitcheck1008@gmail.com"
+                android:text="aamitshilman1008@gmail.com"
                 android:textColor="@color/black"/>
 
         </LinearLayout>
@@ -133,7 +133,7 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginLeft="5dp"
                 android:hint="Password"
-                android:text="Amit100806"
+                android:text="1234567"
                 android:textColor="@color/black"
                 android:inputType="textPassword" />
 
@@ -166,7 +166,7 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginLeft="5dp"
                 android:hint="Confirm Password"
-                android:text="Amit100806"
+                android:text="1234567"
                 android:textColor="@color/black"
                 android:inputType="textPassword" />
 

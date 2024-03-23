@@ -115,8 +115,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Bundle intentExtras = getIntent().getExtras();
+        Bundle connectedUser = intentExtras.getBundle("userConnected");
         EventBus.getDefault().register(this);
 
+        Toast.makeText(this, connectedUser.getString("NAME"), Toast.LENGTH_SHORT).show();
 
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -145,6 +148,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                intent.putExtra("userConnected", connectedUser);
                 startActivity(intent);
             }
         });
@@ -202,8 +206,9 @@ public class MainActivity extends AppCompatActivity {
                 // Iterate through each child node under "Songs"
                 for (DataSnapshot songSnapshot : dataSnapshot.getChildren()) {
 
+                    DBCollection.Song song = songSnapshot.getValue(DBCollection.Song.class);
                     // Get song data
-                    String songName = songSnapshot.child("name").getValue(String.class);
+                    /*String songName = songSnapshot.child("name").getValue(String.class);
                     String singer = songSnapshot.child("singer").getValue(String.class);
                     String genre = songSnapshot.child("genre").getValue(String.class);
                     int year = songSnapshot.child("year").getValue(Integer.class);
@@ -212,26 +217,26 @@ public class MainActivity extends AppCompatActivity {
                     String link = songSnapshot.child("link").getValue(String.class);
 
                     // Create a Song object
-                    DBCollection.Song song = new DBCollection.Song(songName, singer, year, duration,genre, image, link);
+                    DBCollection.Song song = new DBCollection.Song(songName, singer, year, duration,genre, image, link);*/
 
                     // Check if the singer already exists in the map
-                    if (singersMap.containsKey(singer)) {
+                    if (singersMap.containsKey(song.getSinger())) {
                         // If the singer exists, add the song to the existing ArrayList
-                        ArrayList<DBCollection.Song> songsList = singersMap.get(singer);
+                        ArrayList<DBCollection.Song> songsList = singersMap.get(song.getSinger());
                         songsList.add(song);
                     } else {
                         // If the singer doesn't exist, create a new ArrayList and add the song
                         ArrayList<DBCollection.Song> songsList = new ArrayList<>();
                         songsList.add(song);
-                        singersMap.put(singer, songsList);
+                        singersMap.put(song.getSinger(), songsList);
                     }
-                    if (genresMap.containsKey(genre)) {
-                        ArrayList<DBCollection.Song> songsList = genresMap.get(genre);
+                    if (genresMap.containsKey(song.getGenre())) {
+                        ArrayList<DBCollection.Song> songsList = genresMap.get(song.getGenre());
                         songsList.add(song);
                     } else {
                         ArrayList<DBCollection.Song> songsList = new ArrayList<>();
                         songsList.add(song);
-                        genresMap.put(genre, songsList);
+                        genresMap.put(song.getGenre(), songsList);
                     }
                 }
                 // Now, singersMap contains keys as singers and values as ArrayLists of their songs
@@ -262,11 +267,8 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-
                     DBCollection.Song song = dataSnapshot.getValue(DBCollection.Song.class);
                     allSongs.add(song);
-
-
                 }
                 recommendedAdapter = new SongsRecyclerViewAdapter(getApplicationContext(),allSongs);
                 recommendedRecyclerView.setAdapter(recommendedAdapter);
@@ -291,18 +293,13 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-
                     DBCollection.Singer singer = dataSnapshot.getValue(DBCollection.Singer.class);
                     allSingers.add(singer);
-
-
                 }
                 singersAdapter = new SingersRecyclerViewAdapter(getApplicationContext(),allSingers);
                 singersRecyclerView.setAdapter(singersAdapter);
                 singersAdapter.notifyDataSetChanged();
-
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
@@ -320,18 +317,13 @@ public class MainActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
 
                 for (DataSnapshot dataSnapshot : snapshot.getChildren()){
-
                     DBCollection.Genre genre = dataSnapshot.getValue(DBCollection.Genre.class);
                     allGenres.add(genre);
-
-
                 }
                 genresAdapter = new GenresRecyclerViewAdapter(getApplicationContext(),allGenres);
                 genresRecyclerView.setAdapter(genresAdapter);
                 genresAdapter.notifyDataSetChanged();
-
             }
-
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
 
