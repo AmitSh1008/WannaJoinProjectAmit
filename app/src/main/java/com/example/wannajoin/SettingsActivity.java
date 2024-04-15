@@ -5,6 +5,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,12 +18,18 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +42,13 @@ public class SettingsActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
 
     private ImageView profilePic;
-    private TextView userName, userStatus;
+    private TextView userName, userStatus, friendsTitle;
+
+    private ArrayList<DBCollection.User> userFriends;
+    private RecyclerView friendsList;
+
+    private UserFriendsAdapter friendsAdapter;
+    private EditText updateUN, updateStatus;
     private Button btnLogOut, btnAddFriends, btnSetNewUN, btnSetNewStatus;
 
     AutoCompleteTextView autoCompleteTextView;
@@ -43,8 +58,9 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
-        Bundle intentExtras = getIntent().getExtras();
-        Bundle connectedUser = intentExtras.getBundle("userConnected");
+        DBCollection.User connectedUser = LoggedUserManager.getInstance().getLoggedInUser();
+        EventBus.getDefault().register(this);
+
         auth = FirebaseAuth.getInstance();
 
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -52,22 +68,26 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_drawer, R.string.close_drawer);
         drawerLayout.addDrawerListener(drawerToggle);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
 
         profilePic = findViewById(R.id.profilePicture);
         userName = findViewById(R.id.userName);
         userStatus = findViewById(R.id.userStatus);
+        friendsTitle = findViewById(R.id.friendsTitleTextView);
+        friendsList = findViewById(R.id.friendsList);
+
 
         btnLogOut = findViewById(R.id.logoutButton);
+
+        updateUN = findViewById(R.id.updateUsernameEditText);
+        updateStatus = findViewById(R.id.updateStatusEditText);
         btnSetNewUN = findViewById(R.id.updateUsernameBtn);
         btnSetNewStatus = findViewById(R.id.updateStatusBtn);
 
-        userName.setText(connectedUser.getString("NAME"));
-        userStatus.setText(connectedUser.getString("STATUS"));
+        userName.setText(connectedUser.getName());
+        userStatus.setText(connectedUser.getStatus());
         Glide.with(getApplicationContext())
                 .asBitmap()
-                .load(connectedUser.getString("IMAGE"))
+                .load(connectedUser.getImage())
                 .placeholder(R.drawable.default_profile_picture)
                 .into(profilePic);
 
@@ -88,16 +108,40 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        SearchForFriendAdapter adapter = new SearchForFriendAdapter(this, new ArrayList<DBCollection.User>());
+        btnSetNewUN.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!updateUN.getText().toString().isEmpty()) {
+                    LoggedUserManager.getInstance().setNewUsernameToUser(updateUN.getText().toString());
+                    Toast.makeText(getApplicationContext(), "Username changed successfully, Update after restart!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
 
-// Set the adapter to the AutoCompleteTextView
+        btnSetNewStatus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!updateStatus.getText().toString().isEmpty()) {
+                    LoggedUserManager.getInstance().setNewStatusToUser(updateStatus.getText().toString());
+                    Toast.makeText(getApplicationContext(), "Status changed successfully, Update after restart!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        friendsAdapter = new UserFriendsAdapter(getApplicationContext(), LoggedUserManager.getInstance().getUserFriends());
+        LinearLayoutManager friendsLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        friendsList.setLayoutManager(friendsLayoutManager);
+        friendsList.setAdapter(friendsAdapter);
+
+        SearchForFriendAdapter searchFriendsAdapter = new SearchForFriendAdapter(this, new ArrayList<DBCollection.User>());
         autoCompleteTextView = findViewById(R.id.autoCompleteTextView);
-        autoCompleteTextView.setAdapter(adapter);
-
+        autoCompleteTextView.setAdapter(searchFriendsAdapter);
         autoCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String selectedUser = (String) parent.getItemAtPosition(position);
+                DBCollection.User selectedUser = searchFriendsAdapter.getItem(position);
+                LoggedUserManager.getInstance().addFriendByUser(selectedUser);
+                friendsAdapter.updateData();
             }
         });
 
@@ -111,13 +155,22 @@ public class SettingsActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // Call this method to open the drawer
     private void openDrawer() {
         drawerLayout.openDrawer(GravityCompat.START);
     }
 
-    // Call this method to close the drawer
     private void closeDrawer() {
         drawerLayout.closeDrawer(GravityCompat.START);
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onServerMessageEvent(EventMessages.FriendAdded event) {
+        try{
+            friendsAdapter = new UserFriendsAdapter(getApplicationContext(), LoggedUserManager.getInstance().getUserFriends());
+            friendsList.setAdapter(friendsAdapter);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 }

@@ -2,6 +2,7 @@ package com.example.wannajoin;
 
 import static com.example.wannajoin.FBRef.refUsers;
 
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -208,6 +209,7 @@ public class SignUpActivity extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     Uri downloadUri = task.getResult();
                     saveUserData(Uid, username, email, phoneNum, status,  downloadUri.toString());
+                    startActivity(new Intent(getApplicationContext(), LogInActivity.class));
                 } else {
                     // Handle failures
                 }
@@ -216,7 +218,7 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     private void saveUserData(String Uid , String username, String email, String phoneNum, String status, String profileImageUrl) {
-        DBCollection.User user = new DBCollection.User(Uid, username, email, phoneNum, status, profileImageUrl);
+        DBCollection.User user = new DBCollection.User(Uid, username, email, phoneNum, status, profileImageUrl,null, 0, null);
         refUsers.child(Uid).setValue(user);
     }
 

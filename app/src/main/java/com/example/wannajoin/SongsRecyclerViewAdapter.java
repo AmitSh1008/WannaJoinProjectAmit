@@ -58,6 +58,9 @@ public class SongsRecyclerViewAdapter extends RecyclerView.Adapter<SongsRecycler
             @Override
             public void onClick(View view) {
                 EventBus.getDefault().post(new EventMessages.PlaySongEvent(filteredSongsList.get(pos)));
+                LoggedUserManager.getInstance().addRecentBySong(filteredSongsList.get(pos));
+                EventBus.getDefault().post(new EventMessages.RecentAdded());
+
             }
         });
 
@@ -69,10 +72,8 @@ public class SongsRecyclerViewAdapter extends RecyclerView.Adapter<SongsRecycler
         return filteredSongsList.size();
     }
 
-    public void updateData(List<DBCollection.Song> songs) {
-        this.songs.clear();
-        this.songs.addAll(songs);
-        this.filteredSongsList.addAll(this.songs);
+    public void updateData() {
+        filteredSongsList = songs;
         notifyDataSetChanged();
     }
 

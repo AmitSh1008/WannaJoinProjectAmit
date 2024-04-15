@@ -117,7 +117,7 @@ public class LogInActivity extends AppCompatActivity {
                                             else {
                                                 auth.signOut();
                                                 Toast.makeText(getApplicationContext(), "Email Not Verified, please check your email.",
-                                                        Toast.LENGTH_SHORT).show();
+                                                        Toast.LENGTH_LONG).show();
                                             }
                                         } else {
                                             // If sign in fails, display a message to the user.
@@ -157,23 +157,8 @@ public class LogInActivity extends AppCompatActivity {
         refUsers.orderByChild("userId").equalTo(uId).addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot userSnapshot, String prevChildKey) {
-                // Get song data
-                String userId = userSnapshot.child("userId").getValue(String.class);
-                String userName = userSnapshot.child("name").getValue(String.class);
-                String email = userSnapshot.child("email").getValue(String.class);
-                String image = userSnapshot.child("image").getValue(String.class);
-                String phoneNum = userSnapshot.child("phoneNum").getValue(String.class);
-                String status = userSnapshot.child("status").getValue(String.class);
-
-                Bundle foundUser = new Bundle();
-                foundUser.putString("UID", userId);
-                foundUser.putString("NAME", userName);
-                foundUser.putString("IMAGE", image);
-                foundUser.putString("EMAIL", email);
-                foundUser.putString("PHONENUM", phoneNum);
-                foundUser.putString("STATUS", status);
+                LoggedUserManager.getInstance().setLoggedInUser(userSnapshot.getValue(DBCollection.User.class));
                 Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                intent.putExtra("userConnected", foundUser);
                 startActivity(intent);
             }
 

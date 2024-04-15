@@ -113,5 +113,16 @@ public class EventMessages {
         }
     }
 
+    public static class FriendAdded
+    {
+        public FriendAdded() {
 
+        }
+    }
+
+    public static class RecentAdded {
+        public RecentAdded() {
+
+        }
+    }
 }

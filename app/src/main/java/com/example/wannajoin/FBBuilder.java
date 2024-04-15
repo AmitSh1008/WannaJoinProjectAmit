@@ -102,8 +102,8 @@ public class FBBuilder {
         };
         for (int i = 0; i < 39; i++)
         {
-            DBCollection.Song song = new DBCollection.Song(names[i],singers[i],years[i],lengths[i],genres[i], images[i],links[i]);
             final String pushId = FirebaseDatabase.getInstance().getReference().push().getKey();
+            DBCollection.Song song = new DBCollection.Song(pushId, names[i],singers[i],years[i],lengths[i],genres[i], images[i],links[i]);
             refSongs.child(pushId).setValue(song);
         }
     }
@@ -121,9 +121,9 @@ public class FBBuilder {
                     Log.d(TAG, "File: " + entry.getKey() + ", Access Token: " + entry.getValue());
                     String[] names = { "The Weeknd", "Dennis Lloyd", "Nikos Vertis", "Coldplay", "Arctic Monkeys", "Ariana Grande", "Alec Benjamin", "Anne Marie", "Chris Brown", "Calvin Harris", "עומר אדם", "נתן גושן", "אושר כהן", "אייל גולן", "Post Malone", "Harry Styles", "Billie Eilish", "Camila Cabello", "Lewis Capaldi", "Tones and I", "Ed Sheeran", "Lil Nas X", "Imagine Dragons", "Maroon 5", "Selena Gomez", "Dua Lipa", "Lady Gaga", "Taylor Swift", "Joel Corry", "Topic", "Doja Cat", "Tate McRae", "Jason Derulo" };
                     String[] songs = { "I was never there,Moth To A Flame,Blinding Lights", "Never go back", "An eisai ena asteri", "Hymn For The Weekend", "I Wanna Be Yours", "34+35", "Let me down slowly", "2002", "Under The Influence", "Outside", "לבד על המיטה", "מתגעגעת", "אהבה", "מתי את חוזרת", "Rockstar,Circles", "Watermelon Sugar,Falling", "Bad Guy,No Time To Die", "Señorita", "Someone You Loved", "Dance Monkey", "I Dont Care,Shape of You", "Old Town Road", "Believer", "Memories", "Lose You To Love Me", "Dont Start Now", "Rain On Me", "Cardigan", "Head & Heart", "Breaking Me", "Say So", "you broke me first", "Savage Love" };
-                    DBCollection.Singer singer = new DBCollection.Singer(names[singersCounter],songs[singersCounter],fileTokenMap.get(names[singersCounter]));
-                    singersCounter++;
                     final String pushId = FirebaseDatabase.getInstance().getReference().push().getKey();
+                    DBCollection.Singer singer = new DBCollection.Singer(pushId, names[singersCounter],songs[singersCounter],fileTokenMap.get(names[singersCounter]));
+                    singersCounter++;
                     refSingers.child(pushId).setValue(singer);
                 }
             }
@@ -154,8 +154,8 @@ public class FBBuilder {
                 "https://firebasestorage.googleapis.com/v0/b/wannajoin-ecec8.appspot.com/o/Images%2FGenresImages%2FHipHop.jpeg?alt=media&token=712d9371-7415-4e51-b854-7c25fe171fc2"};
         for (int i = 0; i < 4; i++)
         {
-            DBCollection.Genre genre = new DBCollection.Genre(genres[i],songs[i],images[i]);
             final String pushId = FirebaseDatabase.getInstance().getReference().push().getKey();
+            DBCollection.Genre genre = new DBCollection.Genre(pushId, genres[i],songs[i],images[i]);
             refGenres.child(pushId).setValue(genre);
         }
     }

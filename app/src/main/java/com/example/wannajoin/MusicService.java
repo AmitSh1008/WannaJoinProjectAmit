@@ -358,7 +358,7 @@ class IncomingHandler extends Handler {
                 Toast.makeText(getApplicationContext(), "Activity said: " + messageFromActivity, Toast.LENGTH_SHORT).show();
                 break;
             case Constants.MESSANGER.TO_SERVICE_PLAY_SONG:
-                currentSong = new DBCollection.Song(bundle.getString("NAME"),
+                currentSong = new DBCollection.Song(bundle.getString("ID"),bundle.getString("NAME"),
                         bundle.getString("SINGER"),
                         bundle.getInt("YEAR"),
                         bundle.getString("DURATION"),

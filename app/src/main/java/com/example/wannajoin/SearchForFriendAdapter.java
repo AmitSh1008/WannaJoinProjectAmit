@@ -22,8 +22,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SearchForFriendAdapter extends ArrayAdapter<DBCollection.User> implements Filterable {
     private List<DBCollection.User> filteredList;
@@ -61,14 +64,29 @@ public class SearchForFriendAdapter extends ArrayAdapter<DBCollection.User> impl
             DBCollection.User user = filteredList.get(position);
             if (user != null) {
                 viewHolder.userNameTextView.setText(user.getName());
-                viewHolder.hearingPointsTextView.setText("450 minutes");
+                viewHolder.hearingPointsTextView.setText(String.valueOf(user.getHearingPoints()));
                 Glide.with(getContext())
                         .asBitmap()
                         .load(user.getImage())
                         .placeholder(R.drawable.default_profile_picture)
                         .into(viewHolder.profilePicImageView);
+
             }
         }
+//        convertView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                DBCollection.User selectedUser = filteredList.get(position);
+//                //TODO
+//                /*Intent intent = new Intent(getContext(), UserDetailsActivity.class);
+//                intent.putExtra("selected_user", selectedUser);
+//                getContext().startActivity(intent);*/
+//
+//
+//                EventBus.getDefault().post(new EventMessages.FriendAdded());
+//            }
+//        });
+
         return convertView;
     }
 
@@ -102,7 +120,7 @@ public class SearchForFriendAdapter extends ArrayAdapter<DBCollection.User> impl
                             /*if (username.contains(constraint.toString())) {
                                 //filtered.add(user);
                             }*/
-                                if (user.getName().toLowerCase().contains(constraint.toString().toLowerCase())) {
+                                    if ((!Objects.equals(user.getUserId(), LoggedUserManager.getInstance().getLoggedInUser().getUserId())) &&  (LoggedUserManager.getInstance().getLoggedInUser().getFriends() == null || !LoggedUserManager.getInstance().getLoggedInUser().getFriends().contains(user.getUserId())) && (user.getName().toLowerCase().contains(constraint.toString().toLowerCase()))) {
                                     filtered.add(user);
                                 }
                             }

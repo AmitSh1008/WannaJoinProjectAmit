@@ -71,12 +71,15 @@ public class MainActivity extends AppCompatActivity {
 
 
     //Categories
+    private RecyclerView recentRecyclerView;
     private RecyclerView recommendedRecyclerView;
     private RecyclerView singersRecyclerView;
     private RecyclerView genresRecyclerView;
+    private SongsRecyclerViewAdapter recentAdapter;
     private SongsRecyclerViewAdapter recommendedAdapter;
     private SingersRecyclerViewAdapter singersAdapter;
     private GenresRecyclerViewAdapter genresAdapter;
+    private ArrayList<DBCollection.Song> recentSongs;
     private ArrayList<DBCollection.Song> allSongs;
     private ArrayList<DBCollection.Singer> allSingers;
     private ArrayList<DBCollection.Genre> allGenres;
@@ -115,11 +118,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Bundle intentExtras = getIntent().getExtras();
-        Bundle connectedUser = intentExtras.getBundle("userConnected");
         EventBus.getDefault().register(this);
-
-        Toast.makeText(this, connectedUser.getString("NAME"), Toast.LENGTH_SHORT).show();
 
 
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -148,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-                intent.putExtra("userConnected", connectedUser);
+                //intent.putExtra("userConnected", connectedUser);
                 startActivity(intent);
             }
         });
@@ -207,18 +206,6 @@ public class MainActivity extends AppCompatActivity {
                 for (DataSnapshot songSnapshot : dataSnapshot.getChildren()) {
 
                     DBCollection.Song song = songSnapshot.getValue(DBCollection.Song.class);
-                    // Get song data
-                    /*String songName = songSnapshot.child("name").getValue(String.class);
-                    String singer = songSnapshot.child("singer").getValue(String.class);
-                    String genre = songSnapshot.child("genre").getValue(String.class);
-                    int year = songSnapshot.child("year").getValue(Integer.class);
-                    String duration = songSnapshot.child("duration").getValue(String.class);
-                    String image = songSnapshot.child("image").getValue(String.class);
-                    String link = songSnapshot.child("link").getValue(String.class);
-
-                    // Create a Song object
-                    DBCollection.Song song = new DBCollection.Song(songName, singer, year, duration,genre, image, link);*/
-
                     // Check if the singer already exists in the map
                     if (singersMap.containsKey(song.getSinger())) {
                         // If the singer exists, add the song to the existing ArrayList
@@ -256,6 +243,15 @@ public class MainActivity extends AppCompatActivity {
 
     private void buildLists()
     {
+        recentRecyclerView = findViewById(R.id.recently_list);
+        recentRecyclerView.setHasFixedSize(true);
+        LinearLayoutManager recentLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
+        recentRecyclerView.setLayoutManager(recentLayoutManager);
+        recentAdapter = new SongsRecyclerViewAdapter(getApplicationContext(),LoggedUserManager.getInstance().getUserRecents());
+        recentRecyclerView.setAdapter(recentAdapter);
+        recentAdapter.notifyDataSetChanged();
+
+
         recommendedRecyclerView = findViewById(R.id.recommended_list);
         recommendedRecyclerView.setHasFixedSize(true);
         LinearLayoutManager recommendedLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
@@ -363,6 +359,7 @@ public class MainActivity extends AppCompatActivity {
         try{
             Toast.makeText(getApplicationContext(), song.getName() + " - " + song.getSinger(), Toast.LENGTH_SHORT).show();
             Bundle bundle = new Bundle();
+            bundle.putString("ID", song.getId());
             bundle.putString("NAME", song.getName());
             bundle.putString("SINGER", song.getSinger());
             bundle.putInt("YEAR", song.getYear());
@@ -438,6 +435,16 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace(); // Print the exception details
             return 0; // Return 0 for any parsing issues
         }
+    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onServerMessageEvent(EventMessages.RecentAdded event) {
+        try{
+            recentAdapter.updateData();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
 

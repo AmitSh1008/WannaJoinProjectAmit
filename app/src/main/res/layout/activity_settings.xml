@@ -209,7 +209,7 @@
 
     <LinearLayout
         android:id="@+id/side_screen"
-        android:layout_width="300dp"
+        android:layout_width="350dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:background="#B3000000"
@@ -226,6 +226,25 @@
             android:textSize="16sp"
             android:completionThreshold="1"
             android:dropDownVerticalOffset="20dp" />
+
+        <TextView
+            android:id="@+id/friendsTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Friends: "
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_margin="10dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/friendsList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            >
+        </androidx.recyclerview.widget.RecyclerView>
+
     </LinearLayout>
 
 
