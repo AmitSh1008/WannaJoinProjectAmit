@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".MenuBaseActivity">
+
+    <LinearLayout
+        android:id="@+id/bottom_menu_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="8dp"
+        android:orientation="horizontal"
+        android:background="@color/white">
+
+        <!-- Icon 1 (Home) -->
+        <ImageView
+            android:id="@+id/home_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="5dp"
+            android:clickable="true"
+            android:src="@drawable/home" />
+
+        <!-- Empty View to Fill Space (for Groups Icon) -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Icon 2 (Groups) -->
+        <ImageView
+            android:id="@+id/groups_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:src="@drawable/groups_32" />
+
+        <!-- Empty View to Fill Space (for PlayNow Icon) -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Icon 3 (Music Library) -->
+        <ImageView
+            android:id="@+id/play_now_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:src="@drawable/note" />
+
+        <!-- Empty View to Fill Space (for Leaderboard Icon) -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Icon 4 (Leaderboard) -->
+        <ImageView
+            android:id="@+id/leaderboard_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:src="@drawable/leaderboard_32" />
+
+        <!-- Empty View to Fill Space (for Settings Icon) -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <!-- Icon 5 (Settings) -->
+        <ImageView
+            android:id="@+id/settings_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginEnd="5dp"
+            android:clickable="true"
+            android:src="@drawable/settings" />
+    </LinearLayout>
+
+
+</LinearLayout>

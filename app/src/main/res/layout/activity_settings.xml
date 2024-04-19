@@ -26,11 +26,19 @@
             android:gravity="end"
             android:padding="16dp">
 
-            <Button
-                android:id="@+id/logoutButton"
+            <!-- TODO: Implement User Info Update (PFP, NAME, STATUS) -->
+            <ImageView
+                android:id="@+id/editIcon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Log Out"
+                android:src="@drawable/edit_32"
+                android:layout_marginRight="5dp"/>
+
+            <ImageView
+                android:id="@+id/logoutIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/log_out_32"
                 android:layout_marginStart="16dp"/>
 
         </LinearLayout>
@@ -52,25 +60,116 @@
             android:layout_below="@id/profilePicture"
             android:layout_centerHorizontal="true"
             android:layout_marginEnd="100dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="5dp"
+            android:fontFamily="@font/caveat_brush"
             android:gravity="center"
             android:text="UserName"
+            android:textColor="@color/white"
             android:textSize="30sp"
-            android:textStyle="bold"
-            android:textColor="@color/white" />
+            android:textStyle="bold" />
+
+        <!-- TODO: Update UserInfo from firebase -->
+        <LinearLayout
+            android:id="@+id/userInfoLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/userName"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:weightSum="3"
+            android:layout_marginTop="10dp">
+
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/followingsTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4"
+                    android:textSize="15sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="followings"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/followersTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="7"
+                    android:textSize="15sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="followers"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/hearingPointsTv"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="130470"
+                    android:textSize="15sp"
+                    android:textColor="@color/white"
+                    android:layout_gravity="center"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="HearingPoints"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    android:layout_gravity="center"/>
+
+            </LinearLayout>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/userStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/userName"
+            android:layout_below="@id/userInfoLayout"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="15dp"
             android:layout_marginEnd="100dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="5dp"
             android:gravity="center"
             android:text="UserStatus"
-            android:textSize="18sp"
+            android:fontFamily="@font/caveat_brush"
+            android:textSize="22sp"
             android:textColor="@color/white" />
 
         <LinearLayout
@@ -80,72 +179,106 @@
             android:orientation="vertical"
             android:layout_marginTop="10dp">
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Update Profile"
-                android:textColor="@color/white"
-                android:textSize="25sp"
-                android:textStyle="bold"
-                android:layout_marginHorizontal="15dp">
-            </TextView>
+<!--            <TextView-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Update Profile"-->
+<!--                android:fontFamily="@font/caveat_brush"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:textSize="25sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:layout_marginHorizontal="15dp">-->
+<!--            </TextView>-->
 
-            <EditText
-                android:id="@+id/updateUsernameEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/thicker_rounded_square_bg"
-                android:layout_marginTop="15dp"
-                android:layout_marginHorizontal="20dp"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="8dp"
-                android:lines="1"
-                android:textSize="20sp"
-                android:textColor="@color/black"/>
+<!--            <EditText-->
+<!--                android:id="@+id/updateUsernameEditText"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@drawable/thicker_rounded_square_bg"-->
+<!--                android:layout_marginTop="15dp"-->
+<!--                android:layout_marginHorizontal="20dp"-->
+<!--                android:paddingHorizontal="12dp"-->
+<!--                android:paddingVertical="8dp"-->
+<!--                android:lines="1"-->
+<!--                android:textSize="20sp"-->
+<!--                android:textColor="@color/black"/>-->
 
-            <Button
-                android:id="@+id/updateUsernameBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="Set as Username"
-                android:layout_marginHorizontal="10dp">
-            </Button>
+<!--            <Button-->
+<!--                android:id="@+id/updateUsernameBtn"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:text="Set as Username"-->
+<!--                android:layout_marginHorizontal="10dp">-->
+<!--            </Button>-->
 
-            <EditText
-                android:id="@+id/updateStatusEditText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/thicker_rounded_square_bg"
-                android:layout_marginTop="10dp"
-                android:layout_marginHorizontal="20dp"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="8dp"
-                android:lines="1"
-                android:textSize="20sp"
-                android:textColor="@color/black"/>
+<!--            <EditText-->
+<!--                android:id="@+id/updateStatusEditText"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@drawable/thicker_rounded_square_bg"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:layout_marginHorizontal="20dp"-->
+<!--                android:paddingHorizontal="12dp"-->
+<!--                android:paddingVertical="8dp"-->
+<!--                android:lines="1"-->
+<!--                android:textSize="20sp"-->
+<!--                android:textColor="@color/black"/>-->
 
-            <Button
-                android:id="@+id/updateStatusBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="10dp"
-                android:text="Set as Status"
-                android:layout_marginHorizontal="10dp">
-            </Button>
+<!--            <Button-->
+<!--                android:id="@+id/updateStatusBtn"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="center"-->
+<!--                android:layout_marginTop="10dp"-->
+<!--                android:text="Set as Status"-->
+<!--                android:layout_marginHorizontal="10dp">-->
+<!--            </Button>-->
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="App Settings"
+                android:fontFamily="@font/caveat_brush"
                 android:textColor="@color/white"
                 android:textSize="25sp"
                 android:textStyle="bold"
                 android:layout_marginHorizontal="15dp"
                 android:layout_marginVertical="10dp">
             </TextView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/remember_me_35"
+                    android:layout_margin="5dp"
+                    />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_margin="5dp"
+                    android:fontFamily="@font/caveat_brush"
+                    android:gravity="center"
+                    android:onClick="handleRememberMeSwitch"
+                    android:text="Remember Me"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <Switch
+                    android:id="@+id/switchSignedIn"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp"
+                    android:onClick="handleRememberMeSwitch"/>
+
+            </LinearLayout>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -163,6 +296,7 @@
                     android:layout_height="match_parent"
                     android:gravity="center"
                     android:text="Light Mode"
+                    android:fontFamily="@font/caveat_brush"
                     android:textSize="18sp"
                     android:textColor="@color/white"
                     android:textStyle="bold"
@@ -171,7 +305,8 @@
                 <Switch
                     android:id="@+id/switchLightMode"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp"/>
 
             </LinearLayout>
 
@@ -190,7 +325,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Notification"
+                    android:text="Notifications"
+                    android:fontFamily="@font/caveat_brush"
                     android:textSize="18sp"
                     android:textColor="@color/white"
                     android:textStyle="bold"
@@ -199,17 +335,26 @@
                 <Switch
                     android:id="@+id/switchNotifications"
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"/>
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="10dp"/>
 
             </LinearLayout>
 
         </LinearLayout>
 
+        <!-- Bottom Menu Bar -->
+        <include
+            layout="@layout/menu_template_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            />
+
     </RelativeLayout>
 
     <LinearLayout
         android:id="@+id/side_screen"
-        android:layout_width="350dp"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="end"
         android:background="#B3000000"
@@ -228,22 +373,45 @@
             android:dropDownVerticalOffset="20dp" />
 
         <TextView
-            android:id="@+id/friendsTitleTextView"
+            android:id="@+id/followingsTitleTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Friends: "
-            android:textSize="20sp"
+            android:textAlignment="center"
+            android:text="-----Followings-----"
+            android:textSize="25sp"
             android:textColor="@color/white"
             android:textStyle="bold"
             android:layout_margin="10dp"/>
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/friendsList"
+            android:id="@+id/followingsList"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             >
         </androidx.recyclerview.widget.RecyclerView>
+
+        <TextView
+            android:id="@+id/followersTitleTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:text="-----Followers-----"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+            android:layout_margin="10dp"/>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/followersList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            >
+        </androidx.recyclerview.widget.RecyclerView>
+
+
+
 
     </LinearLayout>
 

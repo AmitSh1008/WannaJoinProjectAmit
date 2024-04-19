@@ -88,8 +88,9 @@
             />
 
         <LinearLayout
-            android:layout_above="@id/songTimeLayout"
+            android:layout_below="@id/playingNowSingerTv"
             android:id="@+id/playingButtonsLayout"
+            android:layout_marginTop="15dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -129,13 +130,15 @@
 
         </LinearLayout>
 
+    <!-- TODO: Fix SeekBar and Time -->
         <RelativeLayout
-            android:layout_above="@+id/bottom_menu_bar"
+            android:layout_below="@+id/playingButtonsLayout"
             android:id="@+id/songTimeLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="15dp"
-            android:layout_marginBottom="100dp"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
             >
 
             <SeekBar
@@ -183,56 +186,13 @@
 
         </RelativeLayout>
 
-    <LinearLayout
+    <include
         android:id="@+id/bottom_menu_bar"
+        layout="@layout/menu_template_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:padding="8dp"
-        android:orientation="horizontal"
-        android:background="@color/white">
-
-        <!-- Icon 1 (Home) -->
-        <ImageView
-            android:id="@+id/home_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginStart="5dp"
-            android:clickable="true"
-            android:src="@drawable/home" />
-
-        <!-- Empty View to Fill Space (for Settings Icon) -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <!-- Icon 2 (Music Library) -->
-        <ImageView
-            android:id="@+id/play_now_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:clickable="true"
-            android:src="@drawable/note" />
-
-        <!-- Empty View to Fill Space (for Settings Icon) -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <!-- Icon 3 (Settings) -->
-        <ImageView
-            android:id="@+id/settings_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginEnd="5dp"
-            android:clickable="true"
-            android:src="@drawable/settings" />
-    </LinearLayout>
+        />
 
 
 </RelativeLayout>

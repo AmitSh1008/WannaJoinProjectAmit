@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Create New Room"
+            android:textSize="40sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/caveat_brush"
+            android:textAlignment="center"
+            />
+
+
+        <TextView
+            android:id="@+id/roomNameTitleDialog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:text="Room name:"
+            android:textSize="30sp"
+            android:textColor="@color/black"/>
+
+        <EditText
+            android:id="@+id/roomNameDialog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:hint="Room name"
+            android:textSize="25sp"
+            />
+
+        <TextView
+            android:id="@+id/maxPartsTitleDialog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:text="Max participants:"
+            android:textSize="30sp"
+            android:textColor="@color/black"/>
+
+        <NumberPicker
+            android:id="@+id/maxPartsNPDialog"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_gravity="center_horizontal" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/createBtnDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginRight="10dp"
+                android:layout_gravity="center"
+                android:text="Create"
+                android:textSize="25sp"/>
+
+            <Button
+                android:id="@+id/cancelBtnDialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="10dp"
+                android:layout_gravity="center"
+                android:text="Cancel"
+                android:textSize="25sp"/>
+        </LinearLayout>
+
+
+
+    </LinearLayout>
+
+    
+
+</RelativeLayout>
