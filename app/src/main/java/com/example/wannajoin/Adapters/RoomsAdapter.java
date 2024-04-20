@@ -22,6 +22,7 @@ import com.example.wannajoin.Utilities.DBCollection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.ViewHolder> implements Filterable {
 
@@ -62,13 +63,17 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.ViewHolder> 
         holder.roomItemContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (filteredRoomsList.get(pos).getParticipants().size() == filteredRoomsList.get(pos).getMaxParts())
+                if (RoomManager.getInstance().isInRoom() && Objects.equals(filteredRoomsList.get(pos).getId(), RoomManager.instance.getCurrentRoom().getId()))
+                {
+                    context.startActivity(new Intent(context, InnerRoomActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
+                }
+                else if (filteredRoomsList.get(pos).getParticipants().size() == filteredRoomsList.get(pos).getMaxParts())
                 {
                     Toast.makeText(context, "Room is full!", Toast.LENGTH_SHORT).show();
                 }
                 else if (RoomManager.getInstance().isInRoom())
                 {
-                    Toast.makeText(context, "Already In Room!", Toast.LENGTH_SHORT).show();
+
                 }
                 else {
                     RoomManager.getInstance().joinRoom(filteredRoomsList.get(pos), false);
@@ -126,9 +131,9 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.ViewHolder> 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             this.roomItemContainer = itemView.findViewById(R.id.roomItemContainer);
-            this.groupName = itemView.findViewById(R.id.groupNameTextView);
-            this.groupOwner = itemView.findViewById(R.id.groupOwnerTextView);
-            this.groupParticipants = itemView.findViewById(R.id.groupParticipantsTextView);
+            this.groupName = itemView.findViewById(R.id.roomNameTextView);
+            this.groupOwner = itemView.findViewById(R.id.roomOwnerTextView);
+            this.groupParticipants = itemView.findViewById(R.id.roomParticipantsTextView);
         }
     }
 

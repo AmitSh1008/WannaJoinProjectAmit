@@ -40,28 +40,13 @@
             android:clickable="true"
             android:src="@drawable/groups_32" />
 
-        <!-- Empty View to Fill Space (for PlayNow Icon) -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="1" />
-
-        <!-- Icon 3 (Music Library) -->
-        <ImageView
-            android:id="@+id/play_now_icon"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:clickable="true"
-            android:src="@drawable/note" />
-
         <!-- Empty View to Fill Space (for Leaderboard Icon) -->
         <View
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- Icon 4 (Leaderboard) -->
+        <!-- Icon 3 (Leaderboard) -->
         <ImageView
             android:id="@+id/leaderboard_icon"
             android:layout_width="wrap_content"
@@ -76,7 +61,7 @@
             android:layout_height="0dp"
             android:layout_weight="1" />
 
-        <!-- Icon 5 (Settings) -->
+        <!-- Icon 4 (Settings) -->
         <ImageView
             android:id="@+id/settings_icon"
             android:layout_width="wrap_content"

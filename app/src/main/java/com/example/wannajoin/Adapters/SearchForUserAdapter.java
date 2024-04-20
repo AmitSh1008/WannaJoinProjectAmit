@@ -33,7 +33,7 @@ public class SearchForUserAdapter extends ArrayAdapter<DBCollection.User> implem
     private LayoutInflater inflater;
 
     public SearchForUserAdapter(Context context, List<DBCollection.User> originalList) {
-        super(context, R.layout.layout_user_item);
+        super(context, R.layout.layout_imagename_vertical_item);
         if (originalList.size() > 0)
         {
             this.filteredList = new ArrayList<>(originalList);
@@ -57,7 +57,7 @@ public class SearchForUserAdapter extends ArrayAdapter<DBCollection.User> implem
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.layout_user_item, parent, false);
+            convertView = inflater.inflate(R.layout.layout_imagename_vertical_item, parent, false);
             ViewHolder viewHolder = new ViewHolder(convertView);
             // Add references to other views in your custom layout here
             convertView.setTag(viewHolder);

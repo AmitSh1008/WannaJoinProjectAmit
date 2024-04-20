@@ -2,6 +2,7 @@ package com.example.wannajoin.Adapters;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,62 +17,69 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.wannajoin.Activities.FollowerFollowingProfileActivity;
+import com.example.wannajoin.Managers.PlaylistManager;
 import com.example.wannajoin.R;
 import com.example.wannajoin.Utilities.DBCollection;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserFollowersFollowingAdapter extends RecyclerView.Adapter<UserFollowersFollowingAdapter.ViewHolder> implements Filterable {
+public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAdapter.ViewHolder> implements Filterable {
 
-    private ArrayList<DBCollection.User> users = new ArrayList<>();
+    private ArrayList<DBCollection.Song> songs = new ArrayList<>();
     private final Context context;
-    private List<DBCollection.User> filteredUsersList;
+    private List<DBCollection.Song> filteredSongsList;
+    private int selectedPosition = -1;
 
-    public UserFollowersFollowingAdapter(Context context, ArrayList<DBCollection.User> users) {
-        this.users = users;
-        this.filteredUsersList = new ArrayList<>(users);
+    public SongInPlaylistAdapter(Context context, ArrayList<DBCollection.Song> songs) {
+        this.songs = songs;
+        this.filteredSongsList = new ArrayList<>(songs);
         this.context = context;
     }
 
     @NonNull
     @Override
-    public UserFollowersFollowingAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public SongInPlaylistAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.layout_imagename_vertical_item, parent, false);
-        return new UserFollowersFollowingAdapter.ViewHolder(view);
+        return new SongInPlaylistAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull UserFollowersFollowingAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull SongInPlaylistAdapter.ViewHolder holder, int position) {
         final int pos = position;
-        DBCollection.User userToBuild = filteredUsersList.get(pos);
+        DBCollection.Song songToBuild = filteredSongsList.get(pos);
         int placeholderResourceId = R.drawable.image_not_found;
         Glide.with(context)
                 .asBitmap()
-                .load(userToBuild.getImage())
+                .load(songToBuild.getImage())
                 .placeholder(placeholderResourceId)
                 //.transform(new CircleCrop())
                 .into(holder.profilePicImageView);
 
-        holder.userNameTextView.setText(userToBuild.getName());
+        holder.userNameTextView.setText(songToBuild.getName());
+        if (position == selectedPosition) {
+            holder.userNameTextView.setTextColor(Color.parseColor("#9ADE7B")); // Green color for selected item
+        } else {
+            holder.userNameTextView.setTextColor(Color.WHITE); // White color for other items
+        }
         holder.mainContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(context, FollowerFollowingProfileActivity.class);
-                intent.putExtra("UserInfo", userToBuild);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                context.startActivity(intent);
+                selectedPosition = position;
+                updateData();
+                PlaylistManager.getInstance().jumpToSong(songToBuild);
+
             }
         });
     }
 
     @Override
     public int getItemCount() {
-        return filteredUsersList.size();
+        return filteredSongsList.size();
     }
 
     public void updateData() {
-        filteredUsersList = users;
+        filteredSongsList = songs;
         notifyDataSetChanged();
     }
 
@@ -81,11 +89,11 @@ public class UserFollowersFollowingAdapter extends RecyclerView.Adapter<UserFoll
             @Override
             protected FilterResults performFiltering(CharSequence charSequence) {
                 String searchText = charSequence.toString().toLowerCase();
-                List<DBCollection.User> filtered = new ArrayList<>();
+                List<DBCollection.Song> filtered = new ArrayList<>();
 
-                for (DBCollection.User following : users) {
-                    if (following.getName().toLowerCase().contains(searchText)) {
-                        filtered.add(following);
+                for (DBCollection.Song song : songs) {
+                    if (song.getName().toLowerCase().contains(searchText)) {
+                        filtered.add(song);
 
                     }
                 }
@@ -97,7 +105,7 @@ public class UserFollowersFollowingAdapter extends RecyclerView.Adapter<UserFoll
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                filteredUsersList = (List<DBCollection.User>) filterResults.values;
+                filteredSongsList = (List<DBCollection.Song>) filterResults.values;
                 notifyDataSetChanged();
             }
         };

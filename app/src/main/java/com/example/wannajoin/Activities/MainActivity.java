@@ -36,6 +36,7 @@ import com.example.wannajoin.Adapters.GenresRecyclerViewAdapter;
 import com.example.wannajoin.Adapters.SingersRecyclerViewAdapter;
 import com.example.wannajoin.Adapters.SongsRecyclerViewAdapter;
 import com.example.wannajoin.Managers.LoggedUserManager;
+import com.example.wannajoin.Managers.RoomManager;
 import com.example.wannajoin.R;
 import com.example.wannajoin.Utilities.Constants;
 import com.example.wannajoin.Utilities.DBCollection;
@@ -94,19 +95,13 @@ public class MainActivity extends AppCompatActivity {
 
     private ServiceConnection connection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
-            // This is called when the connection with the service has been
-            // established, giving us the object we can use to
-            // interact with the service.  We are communicating with the
-            // service using a Messenger, so here we get a client-side
-            // representation of that from the raw IBinder object.
             musicService = new Messenger(service);
+            RoomManager.getInstance().setMusicService(musicService);
             bound = true;
 
             Bundle bundle = new Bundle();
             bundle.putString("Message","Cool, all set up!");
             sendMessageToService(Constants.MESSANGER.TO_SERVICE_HELLO, bundle);
-
-
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -144,17 +139,16 @@ public class MainActivity extends AppCompatActivity {
         groupsRedirect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), RoomsActivity.class);
-                startActivity(intent);
-            }
-        });
+                if (RoomManager.getInstance().isInRoom())
+                {
+                    Intent intent = new Intent(getApplicationContext(), InnerRoomActivity.class);
+                    startActivity(intent);
+                }
+                else {
+                    Intent intent = new Intent(getApplicationContext(), RoomsActivity.class);
+                    startActivity(intent);
+                }
 
-        playingNowRedirect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PlayingNowActivity.class);
-                intent.putExtra("Messenger", musicService);
-                startActivity(intent);
             }
         });
 

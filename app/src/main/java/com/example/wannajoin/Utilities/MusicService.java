@@ -1,5 +1,7 @@
 package com.example.wannajoin.Utilities;
 
+import static com.example.wannajoin.Utilities.FBRef.refRooms;
+
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -24,6 +26,7 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
@@ -34,13 +37,20 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.wannajoin.Managers.RoomManager;
 import com.example.wannajoin.R;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import org.greenrobot.eventbus.EventBus;
 
 import java.io.IOException;
-
-
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 
 public class MusicService extends Service {
@@ -78,6 +88,7 @@ public class MusicService extends Service {
     public IBinder onBind(Intent intent) {
         try {
             stopForeground(true);
+            mediaPlayer = new MediaPlayer();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -135,8 +146,8 @@ public class MusicService extends Service {
         if (mediaPlayer != null && mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
         }
-        mediaPlayer = new MediaPlayer();
         try {
+            mediaPlayer.reset();
             mediaPlayer.setDataSource(songLink);
             mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
@@ -398,6 +409,60 @@ class IncomingHandler extends Handler {
                 else if ((mediaPlayer != null && !mediaPlayer.isPlaying())) {
                     mediaPlayer.start();
                 }
+                break;
+            case Constants.MESSANGER.START_LISTENING_TO_ROOM:
+                String roomID = bundle.getString("RoomID");
+                refRooms.child(roomID).child("currentSongStartTime").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if (snapshot.getValue() != null)
+                        {
+                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                            sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jerusalem"));
+                            refRooms.child(RoomManager.getInstance().getCurrentRoom().getId()).child("currentSong").addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                                    DBCollection.Song songToPlay = snapshot.getValue(DBCollection.Song.class);
+                                    Log.d("CheckForPlay",songToPlay.getName());
+                                    playSong(songToPlay.getLink());
+                                    Log.d("Playing Song", songToPlay.getLink());
+                                    EventBus.getDefault().post(new EventMessages.SongPausedPlayed(true));
+                                }
+
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                refRooms.child(RoomManager.getInstance().getCurrentRoom().getId()).child("playing").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        boolean isPlaying = snapshot.getValue(Boolean.class);
+                        if ((mediaPlayer != null && (mediaPlayer.isPlaying() && !isPlaying)))
+                        {
+                            mediaPlayer.pause();
+                            EventBus.getDefault().post(new EventMessages.SongPausedPlayed(false));
+                        }
+                        else if (mediaPlayer != null && (!mediaPlayer.isPlaying() && isPlaying) && mediaPlayer.getCurrentPosition() > 0) {
+                            mediaPlayer.start();
+                            EventBus.getDefault().post(new EventMessages.SongPausedPlayed(true));
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
+                break;
 
 
             default:

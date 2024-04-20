@@ -16,6 +16,9 @@ public class Constants {
         public static final int     PLAYING_NOW_TO_SERVICE_GET_INFO                 = 801;
         public static final int     PLAYING_NOW_TO_SERVICE_PLAY_PAUSE               = 802;
 
+
+        public static final int     START_LISTENING_TO_ROOM                         = 1000;
+
     }
 
     public interface ACTION {

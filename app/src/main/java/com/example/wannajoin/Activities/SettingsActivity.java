@@ -46,7 +46,7 @@ public class SettingsActivity extends AppCompatActivity {
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
 
-    private ImageView imgLogOut, profilePic, homeRedirect, playingNowRedirect;
+    private ImageView imgLogOut, profilePic, homeRedirect;
     private TextView userName, userStatus, followingsTitle, followersTitle, tvFollowers, tvFollowings, tvHearingPoints;
     private RecyclerView followingsList, followersList;
 
@@ -113,9 +113,6 @@ public class SettingsActivity extends AppCompatActivity {
         if (sharedPreferences.getBoolean("StayConnect", false)) {
             rememberMeSwitch.setChecked(true);
         }
-
-
-        playingNowRedirect = findViewById(R.id.play_now_icon);
         homeRedirect = findViewById(R.id.home_icon);
 
         homeRedirect.setOnClickListener(new View.OnClickListener() {
@@ -126,14 +123,6 @@ public class SettingsActivity extends AppCompatActivity {
             }
         });
 
-        playingNowRedirect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), PlayingNowActivity.class);
-                //TODO intent.putExtra("Messenger", musicService);
-                startActivity(intent);
-            }
-        });
         imgLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

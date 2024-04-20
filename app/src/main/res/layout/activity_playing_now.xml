@@ -53,7 +53,6 @@
                     android:padding="5dp"
                     app:strokeColor="@color/black"
                     app:strokeWidth="3dp"
-                    android:src="@drawable/anne_marrie_song"
                     app:shapeAppearanceOverlay="@style/Circular"
                     />
 
@@ -69,7 +68,7 @@
             android:layout_marginTop="15dp"
             android:gravity="center"
             android:layout_centerHorizontal="true"
-            android:text="Never Go Back"
+            android:text=""
             android:textColor="@color/white"
             android:textSize="25sp"
             android:textStyle="bold" />
@@ -82,7 +81,7 @@
             android:layout_marginTop="5dp"
             android:gravity="center"
             android:layout_centerHorizontal="true"
-            android:text="Dennis Lloyd"
+            android:text=""
             android:textColor="@color/white"
             android:textSize="20sp"
             />
@@ -113,9 +112,10 @@
                 android:id="@+id/playPauseBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/pause_86px"
+                android:src="@drawable/play_86px"
                 android:background="#0000"
                 android:layout_gravity="center"
+                android:clickable="true"
                 ></ImageButton>
 
             <ImageButton
@@ -176,7 +176,7 @@
                 android:layout_alignRight="@id/songProgressSeekBar"
                 android:layout_below="@+id/songProgressSeekBar"
                 android:layout_marginRight="8dp"
-                android:text="03:15"
+                android:text="00:00"
                 android:textSize="20sp"
                 android:textStyle="bold"
                 android:textColor="@color/white"

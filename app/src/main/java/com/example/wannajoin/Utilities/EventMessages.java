@@ -130,6 +130,7 @@ public class EventMessages {
         }
     }
 
+
     public static class ParticipantsChangedInRoom {
         private boolean isParticipants;
         public ParticipantsChangedInRoom(boolean isParticipants) {
@@ -139,4 +140,26 @@ public class EventMessages {
             return isParticipants;
         }
     }
+
+    public static class UserInRoomStateChanged {
+        private boolean isInRoom;
+        public UserInRoomStateChanged(boolean isInRoom) {
+            this.isInRoom = isInRoom;
+        }
+        public boolean isInRoom() {
+            return isInRoom;
+        }
+    }
+
+    public static class SongPausedPlayed {
+        private boolean isPlaying;
+
+        public SongPausedPlayed(boolean isPlaying) {
+            this.isPlaying = isPlaying;
+        }
+        public boolean isPlaying() {
+            return isPlaying;
+        }
+    }
+
 }

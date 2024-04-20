@@ -18,7 +18,7 @@
                     android:background="@color/white"></View>
 
                 <TextView
-                    android:id="@+id/groupNameTextView"
+                    android:id="@+id/roomNameTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
@@ -30,7 +30,7 @@
                     android:layout_weight="1"/>
 
                 <TextView
-                    android:id="@+id/groupOwnerTextView"
+                    android:id="@+id/roomOwnerTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Group Owner"
@@ -41,7 +41,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/groupParticipantsTextView"
+                    android:id="@+id/roomParticipantsTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="participants"

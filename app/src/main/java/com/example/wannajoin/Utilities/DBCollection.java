@@ -1,10 +1,16 @@
 package com.example.wannajoin.Utilities;
 
+import static com.example.wannajoin.Utilities.FBRef.refPlaylists;
+
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class DBCollection {
@@ -259,6 +265,26 @@ public class DBCollection {
         public void setLink(String link) {
             this.link = link;
         }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            Song song = (Song) o;
+            return year == song.year &&
+                    Objects.equals(id, song.id) &&
+                    Objects.equals(name, song.name) &&
+                    Objects.equals(singer, song.singer) &&
+                    Objects.equals(duration, song.duration) &&
+                    Objects.equals(genre, song.genre) &&
+                    Objects.equals(image, song.image) &&
+                    Objects.equals(link, song.link);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(id, name, singer, year, duration, genre, image, link);
+        }
     }
 
     public static class Singer{
@@ -369,20 +395,23 @@ public class DBCollection {
         private ArrayList<String> participants;
         private int maxParts;
         private String playlist;
-        private int currentSong;
+        private DBCollection.Song currentSong;
         private String currentSongStartTime;
-        private boolean isActive;
+        private boolean currentSongEnd;
+        private boolean isPlaying;
 
         public Room() {
         }
 
-        public Room(String id, String name, String owner, int maxParts, boolean isActive) {
+        public Room(String id, String name, String owner, int maxParts) {
             this.id = id;
             this.name = name;
             this.owner = owner;
             this.participants = new ArrayList<>();
             this.maxParts = maxParts;
-            this.isActive = isActive;
+            this.playlist = FirebaseDatabase.getInstance().getReference().push().getKey();
+            refPlaylists.child(this.playlist).setValue(new Playlist(this.playlist));
+            this.isPlaying = false;
         }
 
         public String getId() {
@@ -425,32 +454,94 @@ public class DBCollection {
             this.maxParts = maxParts;
         }
 
-        public boolean isActive() {
-            return isActive;
+        public boolean isPlaying() {
+            return isPlaying;
         }
 
-        public void setActive(boolean active) {
-            isActive = active;
+        public void setPlaying(boolean playing) {
+            isPlaying = playing;
+        }
+
+        public String getPlaylist() {
+            return playlist;
+        }
+
+        public void setPlaylist(String playlist) {
+            this.playlist = playlist;
+        }
+
+        public DBCollection.Song getCurrentSong() {
+            return currentSong;
+        }
+
+        public void setCurrentSong(DBCollection.Song currentSong) {
+            this.currentSong = currentSong;
+        }
+
+        public String getCurrentSongStartTime() {
+            return currentSongStartTime;
+        }
+
+        public void setCurrentSongStartTime(String currentSongStartTime) {
+            this.currentSongStartTime = currentSongStartTime;
+        }
+
+        public boolean isCurrentSongEnd() {
+            return currentSongEnd;
+        }
+
+        public void setCurrentSongEnd(boolean currentSongEnd) {
+            this.currentSongEnd = currentSongEnd;
         }
     }
 
     public static class Playlist{
         private String id;
-        private String name;
         private ArrayList<String> songs;
-        private String creationDate;
 
         public Playlist() {
         }
 
-        public Playlist(String id, String name) {
+        public Playlist(String id) {
+            this.id = id;
+            this.songs = new ArrayList<>();
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public void setId(String id) {
+            this.id = id;
+        }
+
+        public ArrayList<String> getSongs() {
+            return songs;
+        }
+
+        public void setSongs(ArrayList<String> songs) {
+            this.songs = songs;
+        }
+
+    }
+
+    public static class PrivatePlaylist {
+        private String id;
+        private String name;
+        private ArrayList<String> songs;
+        private String creationDate;
+
+        public PrivatePlaylist() {
+        }
+
+        public PrivatePlaylist(String id, String name) {
             this.id = id;
             this.name = name;
             this.songs = new ArrayList<>();
-            Date currentTime = new Date();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            dateFormat.setTimeZone(TimeZone.getTimeZone("GMT+2"));
-            this.creationDate = dateFormat.format(currentTime);
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Jerusalem"));
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jerusalem"));
+            this.creationDate = sdf.format(calendar.getTime());
         }
 
         public String getId() {
@@ -485,5 +576,6 @@ public class DBCollection {
             this.creationDate = creationDate;
         }
     }
+
 
 }

@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.wannajoin.Managers.LoggedUserManager;
 import com.example.wannajoin.R;
 import com.example.wannajoin.Utilities.DBCollection;
 import com.example.wannajoin.Utilities.EventMessages;
@@ -60,10 +61,9 @@ public class SongsRecyclerViewAdapter extends RecyclerView.Adapter<SongsRecycler
         holder.imageSong.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO cancel comments of playing song
-                //EventBus.getDefault().post(new EventMessages.PlaySongEvent(filteredSongsList.get(pos)));
-                //LoggedUserManager.getInstance().addRecentBySong(filteredSongsList.get(pos));
-                //EventBus.getDefault().post(new EventMessages.RecentAdded());
+                EventBus.getDefault().post(new EventMessages.PlaySongEvent(filteredSongsList.get(pos)));
+                LoggedUserManager.getInstance().addRecentBySong(filteredSongsList.get(pos));
+                EventBus.getDefault().post(new EventMessages.RecentAdded());
 
 
             }

@@ -136,6 +136,7 @@ public class LoggedUserManager {
         return userRecents;
     }
 
+    //TODO DO NOT DO IN THIS SINGLETON
     public void addUserToFollowByUser(DBCollection.User user)
     {
         refFollows.child(loggedInUser.getUserId()).child("following").child(user.getUserId()).setValue(true);
