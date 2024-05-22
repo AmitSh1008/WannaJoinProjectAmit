@@ -6,9 +6,6 @@ import static com.example.wannajoin.Utilities.FBRef.refSongs;
 import static com.example.wannajoin.Utilities.FBRef.refUsers;
 
 import android.os.Bundle;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -20,7 +17,6 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import org.greenrobot.eventbus.EventBus;
@@ -32,21 +28,35 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RoomManager {
 
     public static RoomManager instance;
     private DBCollection.Room currentRoom;
-    private ArrayList<DBCollection.User> roomParticipants;
-    private ArrayList<DBCollection.Song> roomSongs;
+    private ArrayList<DBCollection.User> roomParticipants = new ArrayList<DBCollection.User>();
+    private ArrayList<DBCollection.Song> roomSongs = new ArrayList<DBCollection.Song>();
     private boolean isOwnedRoom = false;
     private boolean isInRoom = false;
 
-    private Messenger musicService = null;
+    private ValueEventListener roomListener;
+    private ValueEventListener songsListener;
 
-    private interface OnParticipantAddedListener {
-        void onParticipantAdded();
+
+    private interface OnParticipantStateChangedListener {
+        void onParticipantsChanged();
     }
+    private interface OnRoomUpdateStartFinishedListener {
+        void onRoomUpdateStartFinishedReceived();
+    }
+
+    private interface OnRoomSongsReceivedListener {
+        void onRoomSongsReceived();
+    }
+
+
 
 
     public static synchronized RoomManager getInstance() {
@@ -60,47 +70,217 @@ public class RoomManager {
         return currentRoom;
     }
 
-    public void setMusicService(Messenger musicService) {
-        this.musicService = musicService;
-    }
-
-    private void sendMessageToService(int what, Bundle b) {
-
-        Message lMsg = Message.obtain(null, what);
-        lMsg.setData(b);
-        try {
-            musicService.send(lMsg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void joinRoom(DBCollection.Room room, boolean isOwner)
     {
         currentRoom = room;
-        isOwnedRoom = isOwner;
-        isInRoom = true;
-        roomParticipants = new ArrayList<DBCollection.User>();
-        roomSongs = new ArrayList<DBCollection.Song>();
-        addParticipant(new OnParticipantAddedListener() {
+        changeParticipantState(new OnParticipantStateChangedListener() {
             @Override
-            public void onParticipantAdded() {
-                getRoomParticipants();
-                getRoomSongs();
-                EventBus.getDefault().post(new EventMessages.UserInRoomStateChanged(true));
-                Bundle bundle = new Bundle();
-                bundle.putString("RoomID", currentRoom.getId());
-                sendMessageToService(Constants.MESSANGER.START_LISTENING_TO_ROOM, bundle);
+            public void onParticipantsChanged() {
+                startListeningForRoomUpdates(new OnRoomUpdateStartFinishedListener() {
+                    @Override
+                    public void onRoomUpdateStartFinishedReceived() {
+                        startListeningForSongsUpdates(new OnRoomSongsReceivedListener() {
+                            @Override
+                            public void onRoomSongsReceived() {
+                                isOwnedRoom = isOwner;
+                                isInRoom = true;
+                                Bundle bundle = new Bundle();
+                                bundle.putString("RoomID", currentRoom.getId());
+                                PlaylistManager.sendMessageToService(Constants.MESSANGER.START_LISTENING_TO_ROOM, bundle);
+                            }
+                        });
+                    }
+                });
+            }
+        }, true);
+
+//        changeParticipantState(new OnParticipantStateChangedListener() {
+//            @Override
+//            public void onParticipantsChanged() {
+//                Log.d("checkForBug", "onParticipantsChanged");
+//                getRoomParticipants(new OnRoomParticipantsReceivedListener() {
+//                    @Override
+//                    public void onRoomParticipantsReceived() {
+//                        EventBus.getDefault().post(new EventMessages.DataChangedInRoom(true));
+//                        EventBus.getDefault().post(new EventMessages.UserInRoomStateChanged(true));
+//                        getRoomSongs(new OnRoomSongsReceivedListener() {
+//                            @Override
+//                            public void onRoomSongsReceived() {
+//                                EventBus.getDefault().post(new EventMessages.DataChangedInRoom(false));
+//                                Bundle bundle = new Bundle();
+//                                bundle.putString("RoomID", currentRoom.getId());
+//                                PlaylistManager.sendMessageToService(Constants.MESSANGER.START_LISTENING_TO_ROOM, bundle);
+//                            }
+//                        });
+//                    }
+//                });
+//            }
+////                getRoomParticipants();
+////                getRoomSongs();
+////                EventBus.getDefault().post(new EventMessages.UserInRoomStateChanged(true));
+//
+//        }, true);
+    }
+
+    private void startListeningForRoomUpdates(final OnRoomUpdateStartFinishedListener listener) {
+        roomListener = refRooms.child(currentRoom.getId()).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                DBCollection.Room oldRoom = currentRoom;
+                currentRoom = snapshot.getValue(DBCollection.Room.class);
+                if (currentRoom.getParticipants() != null && currentRoom.getParticipants().size() != oldRoom.getParticipants().size()) {
+                    roomParticipants.clear();
+                    int expectedCallbacks = currentRoom.getParticipants().size();
+                    AtomicInteger receivedCallbacks = new AtomicInteger(0);
+                    for (String userId : currentRoom.getParticipants()) {
+                        refUsers.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot userSnapshot) {
+                                DBCollection.User user = userSnapshot.getValue(DBCollection.User.class);
+                                if (user != null) {
+                                    roomParticipants.add(user);
+                                }
+                                receivedCallbacks.incrementAndGet();
+                                if (receivedCallbacks.get() == expectedCallbacks) {
+                                    EventBus.getDefault().post(new EventMessages.DataChangedInRoom(true));
+                                    EventBus.getDefault().post(new EventMessages.UserInRoomStateChanged(true));
+                                    if (!isInRoom)
+                                    {
+                                        listener.onRoomUpdateStartFinishedReceived();
+                                    }
+                                }
+                            }
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
+                                receivedCallbacks.incrementAndGet();
+                                if (receivedCallbacks.get() == expectedCallbacks) {
+                                    EventBus.getDefault().post(new EventMessages.DataChangedInRoom(true));
+                                    EventBus.getDefault().post(new EventMessages.UserInRoomStateChanged(true));
+                                    if (!isInRoom)
+                                    {
+                                        listener.onRoomUpdateStartFinishedReceived();
+                                    }
+                                }
+                            }
+                        });
+                    }
+                }
+                else if (currentRoom.getParticipants() == null && roomParticipants.size() != 0)
+                {
+                    roomParticipants.clear();
+                    EventBus.getDefault().post(new EventMessages.DataChangedInRoom(true));
+                    EventBus.getDefault().post(new EventMessages.UserInRoomStateChanged(true));
+                    if (!isInRoom)
+                    {
+                        listener.onRoomUpdateStartFinishedReceived();
+                    }
+                }
+                else if ((currentRoom.getCurrentSong() != null && oldRoom.getCurrentSong() == null)  || (currentRoom.getCurrentSongStartTime() != null && oldRoom.getCurrentSongStartTime() == null) || (currentRoom.getCurrentSongStartTime() == null && oldRoom.getCurrentSongStartTime() != null) || (currentRoom.getCurrentSongStartTime() != null && !currentRoom.getCurrentSongStartTime().equals(oldRoom.getCurrentSongStartTime())))
+                {
+                    EventBus.getDefault().post(new EventMessages.DataChangedInRoom(false));
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle onCancelled
+            }
+        });
+    }
+
+    private void startListeningForSongsUpdates(final OnRoomSongsReceivedListener listener) {
+        songsListener = refPlaylists.child(currentRoom.getPlaylist()).child("songs").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getChildrenCount() != 0) {
+                    roomSongs.clear();
+                    int expectedCallbacks = (int) snapshot.getChildrenCount();
+                    AtomicInteger receivedCallbacks = new AtomicInteger(0);
+                    for (DataSnapshot songSnapshot : snapshot.getChildren()) {
+                            String songInfo = songSnapshot.getValue(String.class);
+                            String[] songInfoArray = songInfo.split(" ");
+                            String songId = songInfoArray[2].trim();
+                            refSongs.child(songId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(@NonNull DataSnapshot songSnapshot) {
+                                    DBCollection.Song song = songSnapshot.getValue(DBCollection.Song.class);
+                                    if (song != null) {
+                                        roomSongs.add(song);
+                                    }
+                                    receivedCallbacks.incrementAndGet();
+                                    if (receivedCallbacks.get() == expectedCallbacks) {
+                                        if (roomSongs.size() == 1)
+                                        {
+                                            refRooms.child(currentRoom.getId()).child("currentSong").setValue(roomSongs.get(0));
+                                        }
+                                        EventBus.getDefault().post(new EventMessages.DataChangedInRoom(false));
+                                        if (!isInRoom)
+                                        {
+                                            listener.onRoomSongsReceived();
+                                        }
+                                    }
+                                }
+                                @Override
+                                public void onCancelled(@NonNull DatabaseError error) {
+                                    receivedCallbacks.incrementAndGet();
+                                    if (receivedCallbacks.get() == expectedCallbacks) {
+                                        EventBus.getDefault().post(new EventMessages.DataChangedInRoom(false));
+                                        if (!isInRoom)
+                                        {
+                                            listener.onRoomSongsReceived();
+                                        }
+                                    }
+                                }
+                            });
+                    }
+                }
+                else {
+                    roomSongs.clear();
+                    EventBus.getDefault().post(new EventMessages.DataChangedInRoom(false));
+                    if (!isInRoom)
+                    {
+                        listener.onRoomSongsReceived();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                // Handle onCancelled
             }
         });
     }
 
     public void leaveRoom()
     {
-        currentRoom = null;
-        isOwnedRoom = false;
-        isInRoom = false;
-        EventBus.getDefault().post(new EventMessages.UserInRoomStateChanged(false));
+        refRooms.child(currentRoom.getId()).removeEventListener(roomListener);
+//        refRooms.child(currentRoom.getId()).child("participants").removeEventListener(roomParticipantsListener);
+        refPlaylists.child(currentRoom.getPlaylist()).child("songs").removeEventListener(songsListener);
+        changeParticipantState(new OnParticipantStateChangedListener() {
+            @Override
+            public void onParticipantsChanged() {
+                currentRoom = null;
+                isInRoom = false;
+                roomParticipants.clear();
+                roomSongs.clear();
+                EventBus.getDefault().post(new EventMessages.UserInRoomStateChanged(false));
+            }
+        }, false);
+    }
+
+    public void leaveRoomAndJoinAnother(DBCollection.Room room,boolean isOwner)
+    {
+        refRooms.child(currentRoom.getId()).removeEventListener(roomListener);
+//        refRooms.child(currentRoom.getId()).child("participants").removeEventListener(roomParticipantsListener);
+        refPlaylists.child(currentRoom.getPlaylist()).child("songs").removeEventListener(songsListener);
+        changeParticipantState(new OnParticipantStateChangedListener() {
+            @Override
+            public void onParticipantsChanged() {
+                currentRoom = null;
+                isInRoom = false;
+                joinRoom(room, isOwner);
+            }
+        }, false);
     }
 
     public ArrayList<DBCollection.User> getCurrentRoomParticipants()
@@ -129,55 +309,61 @@ public class RoomManager {
         isInRoom = inRoom;
     }
 
-    private void getRoomParticipants()
-    {
-        refRooms.child(currentRoom.getId()).child("participants").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                roomParticipants.clear();
-                if (snapshot.getChildrenCount() != 0) {
-                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                        fillRoomParticipants(snapshot.getChildrenCount(), userSnapshot.getValue(String.class), () -> {
-                            // This callback runs when all followers have been added
-                            EventBus.getDefault().post(new EventMessages.ParticipantsChangedInRoom(true));
-                        });
-                    }
-                } else {
-                    EventBus.getDefault().post(new EventMessages.ParticipantsChangedInRoom(true));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
-
-    private void getRoomSongs()
-    {
-        refPlaylists.child(currentRoom.getPlaylist()).child("songs").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                roomSongs.clear();
-                if (snapshot.getChildrenCount() != 0) {
-                    for (DataSnapshot songSnapshot : snapshot.getChildren()) {
-                        fillRoomSongs(snapshot.getChildrenCount(), songSnapshot.getValue(String.class), () -> {
-                            // This callback runs when all followers have been added
-                            EventBus.getDefault().post(new EventMessages.ParticipantsChangedInRoom(false));
-                        });
-                    }
-                } else {
-                    EventBus.getDefault().post(new EventMessages.ParticipantsChangedInRoom(false));
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
-    }
+//    private void getRoomParticipants(OnRoomUpdateStartFinishedListener listener)
+//    {
+//        roomParticipantsListener =  refRooms.child(currentRoom.getId()).child("participants").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                roomParticipants.clear();
+//                if (snapshot.getChildrenCount() != 0) {
+//                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+//                        fillRoomParticipants(snapshot.getChildrenCount(), userSnapshot.getValue(String.class), () -> {
+//                            if (listener != null) {
+//                                //listener.onRoomParticipantsReceived();
+//                            }
+//                        });
+//                    }
+//                } else {
+//                    if (listener != null) {
+//                        //listener.onRoomParticipantsReceived();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//    }
+//
+//    private void getRoomSongs(OnRoomSongsReceivedListener listener)
+//    {
+//        roomSongsListener = refPlaylists.child(currentRoom.getPlaylist()).child("songs").addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                roomSongs.clear();
+//                if (snapshot.getChildrenCount() != 0) {
+//                    for (DataSnapshot songSnapshot : snapshot.getChildren()) {
+//                        fillRoomSongs(snapshot.getChildrenCount(), songSnapshot.getValue(String.class), () -> {
+//                            if (listener != null) {
+//                                listener.onRoomSongsReceived();
+//                            }
+//                        });
+//                    }
+//                } else {
+//                    if (listener != null) {
+//                        listener.onRoomSongsReceived();
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+//    }
 
     public void fillRoomParticipants(long stopCount, String id, Runnable callback) {
         refUsers.child(id).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -185,7 +371,9 @@ public class RoomManager {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 DBCollection.User userFound = snapshot.getValue(DBCollection.User.class);
                     roomParticipants.add(userFound);
+                    Log.d("checkForBug", "ParticipantAdded");
                     if (callback != null && stopCount == roomParticipants.size()) {
+                        Log.d("checkForBug", "finishAdding1");
                         callback.run();
                     }
             }
@@ -205,7 +393,9 @@ public class RoomManager {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 DBCollection.Song songFound = snapshot.getValue(DBCollection.Song.class);
                 roomSongs.add(songFound);
+                Log.d("checkForBug", "SongAdded");
                 if (callback != null && stopCount == roomSongs.size()) {
+                    Log.d("checkForBug", "finishAdding2");
                     callback.run();
                 }
             }
@@ -218,7 +408,8 @@ public class RoomManager {
     }
 
 
-    private void addParticipant(OnParticipantAddedListener listener) {
+    private void changeParticipantState(OnParticipantStateChangedListener listener,boolean toAdd) {
+
         refRooms.child(currentRoom.getId()).child("participants").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -230,25 +421,28 @@ public class RoomManager {
                         participants.add(participantId);
                     }
                 }
-
-                // Add new participant ID
-                participants.add(LoggedUserManager.getInstance().getLoggedInUser().getUserId());
+                    // Add new participant ID
+                if (toAdd) {
+                    participants.add(LoggedUserManager.getInstance().getLoggedInUser().getUserId());
+                } else {
+                    participants.remove(LoggedUserManager.getInstance().getLoggedInUser().getUserId());
+                }
 
                 // Update the participants list in the database
                 refRooms.child(currentRoom.getId()).child("participants").setValue(participants)
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
-                                Log.d("TAG", "Participant added successfully");
+                                Log.d("TAG", "Participant state changed successfully");
                                 if (listener != null) {
-                                    listener.onParticipantAdded();
+                                    listener.onParticipantsChanged();
                                 }
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.e("TAG", "Error adding participant", e);
+                                Log.e("TAG", "Error changing state for participant", e);
                             }
                         });
             }
@@ -256,46 +450,6 @@ public class RoomManager {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Log.e("TAG", "Error retrieving participants", databaseError.toException());
-            }
-        });
-    }
-
-    public void addSongToCurrentRoom(String newSongId) {
-        refPlaylists.child(currentRoom.getPlaylist()).child("songs").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                List<String> songs = new ArrayList<>();
-                if (dataSnapshot.exists()) {
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        String songId = snapshot.getValue(String.class);
-                        songs.add(songId);
-                    }
-                }
-
-                Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Jerusalem"));
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-                sdf.setTimeZone(TimeZone.getTimeZone("Asia/Jerusalem"));
-                songs.add(sdf.format(calendar.getTime()) + " " + newSongId);
-
-                // Update the participants list in the database
-                refPlaylists.child(currentRoom.getPlaylist()).child("songs").setValue(songs)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("TAG", "Song added successfully");
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.e("TAG", "Error adding song", e);
-                            }
-                        });
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Log.e("TAG", "Error retrieving playlist", databaseError.toException());
             }
         });
     }

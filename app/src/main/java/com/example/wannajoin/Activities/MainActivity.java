@@ -36,6 +36,7 @@ import com.example.wannajoin.Adapters.GenresRecyclerViewAdapter;
 import com.example.wannajoin.Adapters.SingersRecyclerViewAdapter;
 import com.example.wannajoin.Adapters.SongsRecyclerViewAdapter;
 import com.example.wannajoin.Managers.LoggedUserManager;
+import com.example.wannajoin.Managers.PlaylistManager;
 import com.example.wannajoin.Managers.RoomManager;
 import com.example.wannajoin.R;
 import com.example.wannajoin.Utilities.Constants;
@@ -96,12 +97,12 @@ public class MainActivity extends AppCompatActivity {
     private ServiceConnection connection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             musicService = new Messenger(service);
-            RoomManager.getInstance().setMusicService(musicService);
+            PlaylistManager.musicService = musicService;
             bound = true;
 
             Bundle bundle = new Bundle();
             bundle.putString("Message","Cool, all set up!");
-            sendMessageToService(Constants.MESSANGER.TO_SERVICE_HELLO, bundle);
+            PlaylistManager.sendMessageToService(Constants.MESSANGER.TO_SERVICE_HELLO, bundle);
         }
 
         public void onServiceDisconnected(ComponentName className) {
@@ -349,19 +350,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void sendMessageToService(int what, Bundle b) {
-
-        Message lMsg = Message.obtain(null, what);
-        lMsg.setData(b);
-        try {
-            musicService.send(lMsg);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onServerMessageEvent(EventMessages.PlaySongEvent event) {
         DBCollection.Song song = event.getSong();
@@ -375,7 +363,7 @@ public class MainActivity extends AppCompatActivity {
             bundle.putString("DURATION", song.getDuration());
             bundle.putString("IMAGE", song.getImage());
             bundle.putString("LINK", song.getLink());
-            sendMessageToService(Constants.MESSANGER.TO_SERVICE_PLAY_SONG, bundle);
+            PlaylistManager.sendMessageToService(Constants.MESSANGER.TO_SERVICE_PLAY_SONG, bundle);
         } catch (Exception e) {
             e.printStackTrace();
         }

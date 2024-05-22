@@ -18,11 +18,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.wannajoin.Activities.FollowerFollowingProfileActivity;
 import com.example.wannajoin.Managers.PlaylistManager;
+import com.example.wannajoin.Managers.RoomManager;
 import com.example.wannajoin.R;
 import com.example.wannajoin.Utilities.DBCollection;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAdapter.ViewHolder> implements Filterable {
 
@@ -57,15 +59,14 @@ public class SongInPlaylistAdapter extends RecyclerView.Adapter<SongInPlaylistAd
                 .into(holder.profilePicImageView);
 
         holder.userNameTextView.setText(songToBuild.getName());
-        if (position == selectedPosition) {
-            holder.userNameTextView.setTextColor(Color.parseColor("#9ADE7B")); // Green color for selected item
+        if (RoomManager.getInstance().getCurrentRoom().getCurrentSong() != null && Objects.equals(songToBuild.getId(), RoomManager.getInstance().getCurrentRoom().getCurrentSong().getId())) {
+            holder.userNameTextView.setTextColor(Color.parseColor("#9ADE7B"));
         } else {
-            holder.userNameTextView.setTextColor(Color.WHITE); // White color for other items
+            holder.userNameTextView.setTextColor(Color.WHITE);
         }
         holder.mainContainer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectedPosition = position;
                 updateData();
                 PlaylistManager.getInstance().jumpToSong(songToBuild);
 

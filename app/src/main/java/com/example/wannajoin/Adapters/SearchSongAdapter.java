@@ -130,10 +130,6 @@ public class SearchSongAdapter implements ListAdapter, Filterable {
                 }
             }
         });
-
-        //TODO add to playlist
-        //holder.imageSong.setOnLongClickListener();
-
         return convertView;
     }
 

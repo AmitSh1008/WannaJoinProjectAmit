@@ -397,6 +397,7 @@ public class DBCollection {
         private String playlist;
         private DBCollection.Song currentSong;
         private String currentSongStartTime;
+        private int currentSongPausedTime;
         private boolean currentSongEnd;
         private boolean isPlaying;
 
@@ -484,6 +485,14 @@ public class DBCollection {
 
         public void setCurrentSongStartTime(String currentSongStartTime) {
             this.currentSongStartTime = currentSongStartTime;
+        }
+
+        public int getCurrentSongPausedTime() {
+            return currentSongPausedTime;
+        }
+
+        public void setCurrentSongPausedTime(int currentSongPausedTime) {
+            this.currentSongPausedTime = currentSongPausedTime;
         }
 
         public boolean isCurrentSongEnd() {

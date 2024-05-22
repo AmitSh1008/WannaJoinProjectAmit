@@ -52,10 +52,23 @@ public class RoomsActivity extends AppCompatActivity {
     private ViewGroup parentView;
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        // Register EventBus subscriber
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        // Unregister EventBus subscriber
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_rooms);
-        EventBus.getDefault().register(this);
 
         parentView = findViewById(R.id.roomsActivityContainer);
         currentRoomLayout = parentView.findViewById(R.id.currentRoomContainer);

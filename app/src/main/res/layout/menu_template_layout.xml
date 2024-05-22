@@ -13,7 +13,7 @@
         android:layout_alignParentBottom="true"
         android:padding="8dp"
         android:orientation="horizontal"
-        android:background="@color/white">
+        android:background="#626262">
 
         <!-- Icon 1 (Home) -->
         <ImageView

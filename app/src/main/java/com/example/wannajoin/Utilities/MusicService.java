@@ -37,6 +37,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
+import com.example.wannajoin.Managers.PlaylistManager;
 import com.example.wannajoin.Managers.RoomManager;
 import com.example.wannajoin.R;
 import com.google.firebase.database.DataSnapshot;
@@ -51,6 +52,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.TimerTask;
 
 
 public class MusicService extends Service {
@@ -153,13 +156,15 @@ public class MusicService extends Service {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
                     mp.start();
+                    EventBus.getDefault().post(new EventMessages.SongStarted(mp.getDuration()));
                 }
 
             });
+
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
                 public void onCompletion(MediaPlayer mp) {
-
+                    EventBus.getDefault().post(new EventMessages.SongEnded());
                 }
             });
 
@@ -352,6 +357,10 @@ public class MusicService extends Service {
         }
     }
 
+    public static long getDateDifferenceInMilliseconds(Date date1, Date date2) {
+        long difference = date1.getTime() - date2.getTime();
+        return difference;
+    }
 
     @Override
     public void onDestroy(){
@@ -386,19 +395,16 @@ class IncomingHandler extends Handler {
                 Toast.makeText(getApplicationContext(), "Alarm said: " + messageFromAlarm, Toast.LENGTH_SHORT).show();
                 mediaPlayer.stop();
             case Constants.MESSANGER.PLAYING_NOW_TO_SERVICE_GET_INFO:
-                /*Bundle songForPlayingNow = new Bundle();
-                bundle.putString("NAME", currentSong.getName());
-                bundle.putString("SINGER", currentSong.getSinger());
-                bundle.putInt("YEAR", currentSong.getYear());
-                bundle.putString("DURATION", currentSong.getDuration());
-                bundle.putString("IMAGE", currentSong.getImage());
-                bundle.putString("LINK", currentSong.getLink());*/
                 if (currentSong != null && (mediaPlayer != null && mediaPlayer.isPlaying()))
                 {
-                    EventBus.getDefault().post(new EventMessages.SongInfoEvent(true, currentSong));
+                    EventBus.getDefault().post(new EventMessages.SongInfoEvent(1, currentSong, mediaPlayer.getDuration(), mediaPlayer.getCurrentPosition()));
+                }
+                else if (currentSong != null && (mediaPlayer != null && !mediaPlayer.isPlaying() && mediaPlayer.getCurrentPosition() > 0))
+                {
+                    EventBus.getDefault().post(new EventMessages.SongInfoEvent(2, currentSong,mediaPlayer.getDuration(), mediaPlayer.getCurrentPosition()));
                 }
                 else {
-                    EventBus.getDefault().post(new EventMessages.SongInfoEvent(false, null));
+                    EventBus.getDefault().post(new EventMessages.SongInfoEvent(0, currentSong, 0, 0));
                 }
                 break;
             case Constants.MESSANGER.PLAYING_NOW_TO_SERVICE_PLAY_PAUSE:
@@ -422,11 +428,8 @@ class IncomingHandler extends Handler {
                             refRooms.child(RoomManager.getInstance().getCurrentRoom().getId()).child("currentSong").addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    DBCollection.Song songToPlay = snapshot.getValue(DBCollection.Song.class);
-                                    Log.d("CheckForPlay",songToPlay.getName());
-                                    playSong(songToPlay.getLink());
-                                    Log.d("Playing Song", songToPlay.getLink());
-                                    EventBus.getDefault().post(new EventMessages.SongPausedPlayed(true));
+                                    currentSong = snapshot.getValue(DBCollection.Song.class);
+                                    playSong(currentSong.getLink());
                                 }
 
                                 @Override
@@ -449,11 +452,14 @@ class IncomingHandler extends Handler {
                         if ((mediaPlayer != null && (mediaPlayer.isPlaying() && !isPlaying)))
                         {
                             mediaPlayer.pause();
-                            EventBus.getDefault().post(new EventMessages.SongPausedPlayed(false));
+                            EventBus.getDefault().post(new EventMessages.SongPausedPlayed(false, 0));
                         }
                         else if (mediaPlayer != null && (!mediaPlayer.isPlaying() && isPlaying) && mediaPlayer.getCurrentPosition() > 0) {
+                            int pauseTime = RoomManager.getInstance().getCurrentRoom().getCurrentSongPausedTime();
+                            mediaPlayer.seekTo(pauseTime);
                             mediaPlayer.start();
-                            EventBus.getDefault().post(new EventMessages.SongPausedPlayed(true));
+                            EventBus.getDefault().post(new EventMessages.SongPausedPlayed(true, mediaPlayer.getCurrentPosition()));
+
                         }
                     }
 

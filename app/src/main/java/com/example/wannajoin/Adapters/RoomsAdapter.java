@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.wannajoin.Activities.InnerRoomActivity;
+import com.example.wannajoin.Managers.LoggedUserManager;
 import com.example.wannajoin.Managers.RoomManager;
 import com.example.wannajoin.R;
 import com.example.wannajoin.Utilities.DBCollection;
@@ -67,16 +68,17 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.ViewHolder> 
                 {
                     context.startActivity(new Intent(context, InnerRoomActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 }
-                else if (filteredRoomsList.get(pos).getParticipants().size() == filteredRoomsList.get(pos).getMaxParts())
+                else if (filteredRoomsList.get(pos).getParticipants() != null && filteredRoomsList.get(pos).getParticipants().size() == filteredRoomsList.get(pos).getMaxParts())
                 {
                     Toast.makeText(context, "Room is full!", Toast.LENGTH_SHORT).show();
                 }
                 else if (RoomManager.getInstance().isInRoom())
                 {
-
+                    RoomManager.getInstance().leaveRoomAndJoinAnother(filteredRoomsList.get(pos), filteredRoomsList.get(pos).getOwner().equals(LoggedUserManager.getInstance().getLoggedInUser().getName()));
+                    context.startActivity(new Intent(context, InnerRoomActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 }
                 else {
-                    RoomManager.getInstance().joinRoom(filteredRoomsList.get(pos), false);
+                    RoomManager.getInstance().joinRoom(filteredRoomsList.get(pos), filteredRoomsList.get(pos).getOwner().equals(LoggedUserManager.getInstance().getLoggedInUser().getName()));
                     context.startActivity(new Intent(context, InnerRoomActivity.class).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK));
                 }
             }

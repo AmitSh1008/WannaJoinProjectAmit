@@ -85,15 +85,20 @@ public class EventMessages {
 
     public static class SongInfoEvent
     {
-        private boolean isPlaying;
+        private int state;
         private DBCollection.Song song;
+        private int duration;
+        private int currentTime;
 
         public SongInfoEvent() {
 
         }
-        public SongInfoEvent(boolean isPlaying, DBCollection.Song song) {
-            this.isPlaying = isPlaying;
+
+        public SongInfoEvent(int state, DBCollection.Song song, int duration, int currentTime) {
+            this.state = state;
             this.song = song;
+            this.duration = duration;
+            this.currentTime = currentTime;
         }
 
         public DBCollection.Song getSong() {
@@ -104,12 +109,28 @@ public class EventMessages {
             this.song = song;
         }
 
-        public boolean isPlaying() {
-            return isPlaying;
+        public int getState() {
+            return state;
         }
 
-        public void setPlaying(boolean playing) {
-            isPlaying = playing;
+        public void setState(int state) {
+            this.state = state;
+        }
+
+        public int getDuration() {
+            return duration;
+        }
+
+        public void setDuration(int duration) {
+            this.duration = duration;
+        }
+
+        public int getCurrentTime() {
+            return currentTime;
+        }
+
+        public void setCurrentTime(int currentTime) {
+            this.currentTime = currentTime;
         }
     }
 
@@ -131,9 +152,10 @@ public class EventMessages {
     }
 
 
-    public static class ParticipantsChangedInRoom {
+    public static class DataChangedInRoom {
         private boolean isParticipants;
-        public ParticipantsChangedInRoom(boolean isParticipants) {
+
+        public DataChangedInRoom(boolean isParticipants) {
             this.isParticipants = isParticipants;
         }
         public boolean isParticipants() {
@@ -151,14 +173,36 @@ public class EventMessages {
         }
     }
 
+    public static class SongStarted {
+        private int currentSongDuration;
+
+        public SongStarted(int currentSongDuration) {
+            this.currentSongDuration = currentSongDuration;
+        }
+        public int getCurrentSongDuration() {
+            return currentSongDuration;
+        }
+    }
+
     public static class SongPausedPlayed {
         private boolean isPlaying;
+        private int playtime;
 
-        public SongPausedPlayed(boolean isPlaying) {
+        public SongPausedPlayed(boolean isPlaying, int playtime) {
             this.isPlaying = isPlaying;
+            this.playtime = playtime;
         }
         public boolean isPlaying() {
             return isPlaying;
+        }
+
+        public int getPlaytime() {
+            return playtime;
+        }
+    }
+
+    public static class SongEnded {
+        public SongEnded() {
         }
     }
 

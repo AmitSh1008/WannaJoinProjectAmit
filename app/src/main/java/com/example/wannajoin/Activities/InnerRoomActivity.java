@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -19,6 +20,7 @@ import com.example.wannajoin.Adapters.SearchForUserAdapter;
 import com.example.wannajoin.Adapters.SearchSongAdapter;
 import com.example.wannajoin.Adapters.SongInPlaylistAdapter;
 import com.example.wannajoin.Adapters.UserFollowersFollowingAdapter;
+import com.example.wannajoin.Managers.PlaylistManager;
 import com.example.wannajoin.Managers.RoomManager;
 import com.example.wannajoin.R;
 import com.example.wannajoin.Utilities.DBCollection;
@@ -38,13 +40,26 @@ public class InnerRoomActivity extends AppCompatActivity {
     private UserFollowersFollowingAdapter participantsAdapter;
     private SongInPlaylistAdapter playlistAdapter;
     private AutoCompleteTextView actvSearchForSong;
-    private ImageView playingNowRedirect;
+    private ImageView playingNowRedirect, leaveRoomRedirect;
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Register EventBus subscriber
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    protected void onStop() {
+        // Unregister EventBus subscriber
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inner_room);
-        EventBus.getDefault().register(this);
 
         tvRoomName = findViewById(R.id.tvRoomName);
         tvParticipantsTitle = findViewById(R.id.tvParticipantsTitle);
@@ -53,6 +68,7 @@ public class InnerRoomActivity extends AppCompatActivity {
         lvPlaylist = findViewById(R.id.lvRoomPlaylist);
         actvSearchForSong = findViewById(R.id.searchForSongPlaylist);
         playingNowRedirect = findViewById(R.id.playingNowIcon);
+        leaveRoomRedirect = findViewById(R.id.leaveRoomIcon);
 
         tvRoomName.setText(RoomManager.getInstance().getCurrentRoom().getName());
         participantsAdapter = new UserFollowersFollowingAdapter(getApplicationContext(), RoomManager.getInstance().getCurrentRoomParticipants());
@@ -71,7 +87,7 @@ public class InnerRoomActivity extends AppCompatActivity {
                 actvSearchForSong.setText("");
                 InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
                 imm.hideSoftInputFromWindow(actvSearchForSong.getWindowToken(), 0);
-                RoomManager.getInstance().addSongToCurrentRoom(selectedSong.getId());
+                PlaylistManager.getInstance().addSongToCurrentRoom(selectedSong.getId());
             }
         });
 
@@ -88,6 +104,15 @@ public class InnerRoomActivity extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext(), PlayingNowActivity.class));
             }
         });
+
+        leaveRoomRedirect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RoomManager.getInstance().leaveRoom();
+                startActivity(new Intent(getApplicationContext(), RoomsActivity.class));
+            }
+        });
+
 
     }
 
@@ -108,8 +133,9 @@ public class InnerRoomActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onServerMessageEvent(EventMessages.ParticipantsChangedInRoom event) {
+    public void onServerMessageEvent(EventMessages.DataChangedInRoom event) {
         try{
+            Log.d("checkForBug", "DataChangedInRoom - " + event.isParticipants());
             if (event.isParticipants())
             {
                 tvParticipantsTitle.setText(createParticipantsCount());
@@ -118,6 +144,13 @@ public class InnerRoomActivity extends AppCompatActivity {
             else {
                 tvPlaylistTitle.setText(createPlaylistCount());
                 playlistAdapter.updateData();
+                if (playlistAdapter.getItemCount() == 0)
+                {
+                    playingNowRedirect.setVisibility(View.INVISIBLE);
+                }
+                else {
+                    playingNowRedirect.setVisibility(View.VISIBLE);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();

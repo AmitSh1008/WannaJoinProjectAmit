@@ -186,7 +186,6 @@ public class SettingsActivity extends AppCompatActivity {
         LinearLayoutManager followersLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         followersList.setLayoutManager(followersLayoutManager);
         followersList.setAdapter(followersAdapter);
-
         SearchForUserAdapter searchForUserAdapter = new SearchForUserAdapter(this, new ArrayList<DBCollection.User>());
         autoCompleteTextView = findViewById(R.id.autoCompleteTextView);
         autoCompleteTextView.setAdapter(searchForUserAdapter);

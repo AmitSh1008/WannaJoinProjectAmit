@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#CC000000"
+    android:background="@color/activityBackgroundColor"
     tools:context=".PlayingNowActivity"
     >
 
@@ -24,8 +24,8 @@
         <RelativeLayout
             android:layout_below="@id/playigNowText"
             android:id="@+id/songImageLayout"
-            android:layout_width="325dp"
-            android:layout_height="325dp"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="35dp"
             android:padding="10dp"
@@ -39,16 +39,16 @@
 
                 <ImageView
                     android:id="@+id/discPlayingNow"
-                    android:layout_width="300dp"
-                    android:layout_height="300dp"
+                    android:layout_width="276dp"
+                    android:layout_height="276dp"
                     android:src="@drawable/disc"
                     android:layout_gravity="center"/>
 
                 <!-- Inner song circle image -->
                 <com.google.android.material.imageview.ShapeableImageView
                     android:id="@+id/songInnerImage"
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                    android:layout_width="138dp"
+                    android:layout_height="138dp"
                     android:layout_gravity="center"
                     android:padding="5dp"
                     app:strokeColor="@color/black"

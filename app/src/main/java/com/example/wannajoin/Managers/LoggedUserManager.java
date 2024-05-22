@@ -26,9 +26,9 @@ import java.util.ArrayList;
 public class LoggedUserManager {
     private static LoggedUserManager instance;
     private DBCollection.User loggedInUser;
-    private ArrayList<DBCollection.User> userFollowers;
-    private ArrayList<DBCollection.User> userFollowings;
-    private ArrayList<DBCollection.Song> userRecents;
+    private ArrayList<DBCollection.User> userFollowers  = new ArrayList<DBCollection.User>();;
+    private ArrayList<DBCollection.User> userFollowings = new ArrayList<DBCollection.User>();;
+    private ArrayList<DBCollection.Song> userRecents = new ArrayList<DBCollection.Song>();
     private boolean isFollowersChanged = false;
     private boolean isFollowingsChanged = false;
 
@@ -45,9 +45,9 @@ public class LoggedUserManager {
 
     public void setLoggedInUser(DBCollection.User user) {
         this.loggedInUser = user;
-        userFollowings = new ArrayList<DBCollection.User>();
-        userFollowers = new ArrayList<DBCollection.User>();
-        userRecents = new ArrayList<DBCollection.Song>();
+        userFollowings.clear();
+        userFollowers.clear();
+        userRecents.clear();
         getUserFollowersAndFollowing();
         if (loggedInUser.getRecents() != null) {
             for (String Uid : loggedInUser.getRecents()) {

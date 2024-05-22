@@ -2,5 +2,5 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="activityBackgroundColor">#cc000000</color>
+    <color name="activityBackgroundColor">#060606</color>
 </resources>
